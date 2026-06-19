@@ -9,6 +9,7 @@ export default defineWorkersConfig(async () => {
       poolOptions: {
         workers: {
           wrangler: { configPath: './wrangler.jsonc' },
+          singleWorker: true,
           miniflare: {
             compatibilityDate: '2024-09-23',
             compatibilityFlags: ['nodejs_compat'],
