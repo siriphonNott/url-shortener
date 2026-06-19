@@ -6,8 +6,10 @@ Currently **live on the `eraflow.dev` zone** (blly.to is the eventual brand but 
 
 ## Current state (resume here)
 
-- **Branch:** `migrate-to-cloudflare-d1` → **PR #1** into `main` (open). All work lands here until merged.
-- **Backend:** complete, **70/70 tests passing**, deployed.
+- **Trunk is `main`.** The migration (PR #1, `migrate-to-cloudflare-d1`) is **merged** and **deployed from `main`**.
+  Start new work on a fresh branch off `main`. (Direct push to `main` is harness-blocked — see Gotchas; land changes
+  via a branch + `gh pr merge` as `siriphonNott`.)
+- **Backend:** complete, **70/70 tests passing**.
 - **Deployed (Cloudflare account `siriphonnot@gmail.com`):**
   - `https://api.eraflow.dev` — API (Worker `blly-api`)
   - `https://eraflow.dev` — landing + short-link redirects (same Worker `blly-api`, static assets)
