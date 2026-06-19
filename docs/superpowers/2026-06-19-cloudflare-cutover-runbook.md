@@ -109,3 +109,25 @@ curl -i https://blly.to/<code>                    # 302 to destination
 - CORS locked to `https://app.blly.to` (+ `http://localhost:5173` for dev) in `src/app.ts`.
 - Legacy Express src tree and `vercel.json` removed.
 - 69 local tests passing (`npm test`).
+
+---
+
+## Frontend deploy (management SPA + landing)
+
+The `web/` Vue SPA contains both the landing (`/`) and the management app (`/login`, `/dashboard`, …). It is split across two hosts:
+
+- **`app.eraflow.dev`** — the full SPA, deployed as a static-assets Worker (`web/wrangler.jsonc`, `blly-web`) with `not_found_handling: single-page-application` so history-mode routes resolve on refresh/deep-link.
+- **`eraflow.dev` (apex)** — the **same build** is copied into `api/public/` and served by the API Worker; `/` = landing, `/{code}` = redirect. The apex CANNOT use SPA fallback (it would shadow `/{code}`), so the landing's Login/CTA buttons link to `VITE_APP_URL` (`https://app.eraflow.dev`) rather than client-side routes.
+
+Build-time config is `web/.env.production` (`VITE_API_URL=https://api.eraflow.dev/api/v1`, `VITE_BASE_SHORT_URL=https://eraflow.dev`, `VITE_APP_URL=https://app.eraflow.dev`).
+
+To (re)deploy the frontend after any `web/` change — **rebuild and deploy BOTH**, or the apex landing goes stale:
+```bash
+cd web && npm run build                 # → web/dist (uses .env.production)
+npx wrangler deploy                      # → app.eraflow.dev (blly-web)
+rm -rf ../api/public/* && cp -r dist/. ../api/public/   # refresh apex landing assets
+cd ../api && npx wrangler deploy         # → eraflow.dev apex + api.eraflow.dev (blly-api)
+```
+> `api/public/` is a generated copy of `web/dist` (committed so the API Worker deploys standalone). Always regenerate it from `web/dist` — do not hand-edit.
+
+When moving to blly.to later: update `web/.env.production` (app/api/short URLs), `web/wrangler.jsonc` route, and `api/wrangler.jsonc` routes/BASE_SHORT_URL + CORS origin, then rebuild + redeploy both.

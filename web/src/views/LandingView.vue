@@ -20,15 +20,15 @@
       <div class="flex items-center gap-3">
         <LanguageSwitcher />
         <ThemeToggle />
-        <router-link
-          to="/login"
+        <a
+          :href="loginUrl"
           class="shine-btn relative overflow-hidden flex items-center gap-2 bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white text-sm font-bold px-5 py-2.5 rounded-2xl shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-200 hover:-translate-y-px"
         >
           {{ $t('auth.login') }}
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
           </svg>
-        </router-link>
+        </a>
       </div>
     </nav>
 
@@ -55,15 +55,15 @@
 
       <!-- CTAs -->
       <div class="hero-cta flex items-center gap-4 flex-wrap justify-center">
-        <router-link
-          to="/login"
+        <a
+          :href="loginUrl"
           class="shine-btn relative overflow-hidden flex items-center gap-2 bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white font-bold px-8 py-4 rounded-2xl shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 text-base"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
           </svg>
           {{ $t('landing.ctaPrimary') }}
-        </router-link>
+        </a>
         <a
           href="#features"
           class="flex items-center gap-2 text-gray-600 dark:text-slate-300 font-semibold px-6 py-4 rounded-2xl border border-gray-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800/80 transition-all duration-200 text-base hover:-translate-y-0.5"
@@ -282,15 +282,15 @@
             <p class="text-blue-100 mb-8 max-w-md mx-auto leading-relaxed">
               {{ $t('landing.ctaSub') }}
             </p>
-            <router-link
-              to="/login"
+            <a
+              :href="loginUrl"
               class="inline-flex items-center gap-2 bg-white text-blue-600 font-extrabold px-8 py-4 rounded-2xl hover:bg-blue-50 transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 text-base"
             >
               {{ $t('landing.ctaBtn') }}
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
               </svg>
-            </router-link>
+            </a>
           </div>
         </div>
       </div>
@@ -311,9 +311,9 @@
         <p class="text-xs text-gray-400 dark:text-slate-600">
           {{ $t('landing.copyright') }}
         </p>
-        <router-link to="/login" class="text-xs text-gray-400 dark:text-slate-500 hover:text-blue-500 dark:hover:text-blue-400 transition-colors font-medium">
+        <a :href="loginUrl" class="text-xs text-gray-400 dark:text-slate-500 hover:text-blue-500 dark:hover:text-blue-400 transition-colors font-medium">
           {{ $t('landing.signIn') }}
-        </router-link>
+        </a>
       </div>
     </footer>
 
@@ -329,6 +329,10 @@ import { useTheme } from '../composables/useTheme';
 
 const { init: initTheme } = useTheme();
 const { t } = useI18n();
+
+// Landing is served on the apex (eraflow.dev) while the app lives on a separate host;
+// send login/CTA to the app domain (VITE_APP_URL), falling back to a same-origin /login in dev.
+const loginUrl = (import.meta.env.VITE_APP_URL || '') + '/login';
 
 const stats = computed(() => [
   { value: t('landing.statFastValue'), label: t('landing.statFast') },
