@@ -1,5 +1,5 @@
 {
-  "name": "short-link-web",
+  "name": "url-shortener-web",
   "version": "1.0.0",
   "scripts": {
     "dev": "vite",
