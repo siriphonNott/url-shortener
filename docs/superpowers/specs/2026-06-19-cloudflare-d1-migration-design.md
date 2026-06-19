@@ -1,8 +1,8 @@
 # Migrating url-shortener from MongoDB Atlas to Cloudflare (D1 + Workers)
 
 - **Date:** 2026-06-19
-- **Status:** Approved design — revised after adversarial review (pending final spec review)
-- **Scope of this spec:** the **backend** only (API → Hono/Workers, DB → D1). The Vue frontend → Cloudflare Pages move is a **separate sub-project** (see §15).
+- **Status:** Approved design — revised after adversarial review + domain/API-key decisions (pending final spec review)
+- **Scope of this spec:** the **backend** (API → Hono/Workers, DB → D1) plus the Worker serving the **landing page** as static assets and the **redirect** on the apex. Building the Vue app and deploying the **management app** to Pages is a **separate sub-project** (see §15).
 
 ## 1. Context
 
@@ -20,15 +20,14 @@ This spec migrates the database and API runtime to Cloudflare.
 - Replace MongoDB Atlas with **Cloudflare D1** (serverless SQLite).
 - Port the Express API to **Hono on Cloudflare Workers** (TypeScript + ESM).
 - Access D1 via **Drizzle ORM** (schema-as-code; camelCase JS fields mapped to snake_case columns).
-- **Preserve the existing API contract byte-for-byte** — paths, JSON envelopes, field names (incl. `_id` and camelCase), and error bodies — so the only frontend change is the two base-URL env vars (§15).
+- **Preserve the existing API contract** — paths, JSON envelopes, field names (incl. `_id` and camelCase), and error bodies — **except one deliberate, approved change: API-key storage moves to hash + prefix + show-once** (§7.3). All other shapes stay identical so the management-app frontend changes only its two base-URL env vars plus the API-key UI (§15).
 
 **Non-goals (this round)**
 
 - No data migration — **greenfield**; seed an admin user + roles.
 - No KV cache, Analytics Engine, or Durable Objects (MVP = D1 only; designed to layer in later, §13).
-- **No API-key hashing** — the current API returns/searches plaintext keys, so hashing would break the contract (§7.3). Deferred to §13.
 - No new product features. No backend-side change to RBAC enforcement (see §6.2).
-- **Frontend → Pages is out of scope here** — tracked as a separate sub-project (§15).
+- **Building the Vue app + deploying the management app to Pages is out of scope here** — separate sub-project (§15). This spec's Worker *does* serve the landing-page build as static assets (§4.2).
 
 ## 3. Decisions (from brainstorming)
 
@@ -37,10 +36,20 @@ This spec migrates the database and API runtime to Cloudflare.
 | API runtime | Express/Vercel → **Hono / Cloudflare Workers**, TypeScript + ESM |
 | Database | MongoDB Atlas → **D1 (SQLite)** |
 | Data access | **Drizzle ORM** (+ `drizzle-kit generate` → `wrangler d1 migrations apply`) |
-| Topology | **Single Worker**, hostname-routed: short domain → `/:code`; API domain → `/api/v1/*` |
+| Topology | **One Worker** owns `api.blly.to/*` (API) **and** `blly.to/*` (landing static assets + `/:code` redirect) |
 | Data migration | **Greenfield** — seed admin + roles |
-| Redirect path | **D1 only (MVP)** |
-| Frontend | Vue → Cloudflare Pages — **separate sub-project** (§15) |
+| Redirect path | **D1 only (MVP)**, in the Worker, coexisting with the landing static assets on the apex |
+| API keys | **Hash (SHA-256) + non-secret prefix + show-once** (replaces plaintext) — deliberate contract change (§7.3) |
+| Management app | Vue → Cloudflare Pages on `app.blly.to` — **separate sub-project** (§15) |
+
+### 3.1 Domain map
+
+| Surface | Domain | Served by |
+|---|---|---|
+| API | `api.blly.to/api/v1/*` | this Worker |
+| Redirect | `blly.to/:code` | this Worker (D1 lookup → 302) |
+| Landing page | `blly.to/` | this Worker (Static Assets) |
+| Management app | `app.blly.to` | Cloudflare Pages (sub-project §15) |
 
 ## 4. Architecture
 
@@ -62,31 +71,38 @@ url-shortener/
 │   │       ├── errorCodes.ts    # ERRORS map verbatim; ok()/fail() re-signatured for Hono
 │   │       ├── password.ts      # WebCrypto PBKDF2 hash/verify
 │   │       ├── jwt.ts           # sign/verify (jose) — explicit iat/exp
-│   │       ├── keys.ts          # API-key generation (WebCrypto)
+│   │       ├── keys.ts          # API-key gen + SHA-256 hash + prefix (WebCrypto)
 │   │       └── meta.ts          # fetch()-based URL metadata (replaces Node http/https)
+│   ├── public/                  # landing-page build output (Static Assets) — produced by §15
 │   ├── drizzle/                 # generated migration SQL
 │   ├── drizzle.config.ts
-│   ├── wrangler.jsonc
+│   ├── wrangler.jsonc           # D1 binding, assets binding, routes (api + apex), secrets/vars
 │   └── package.json
-└── web/                         # (separate sub-project) Vue → Pages; only env base URLs change
+└── web/                         # (separate sub-project) Vue: landing build feeds api/public; app → Pages
 ```
 
-### 4.2 Single-Worker hostname routing
+### 4.2 One Worker: hostname routing + Static Assets on the apex
 
-One Worker, one Hono app, dispatched by hostname:
+One Worker (routes `api.blly.to/*` + `blly.to/*`) with a **Workers Static Assets** binding pointing at the landing build (`api/public`). Dispatch:
 
-- **Short domain** (e.g. `blly.to`) → only `GET /:code` (public redirect).
-- **API domain** (e.g. `api.blly.to`) → `/api/v1/*`.
+- **`api.blly.to`** → Hono `/api/v1/*` (CORS → auth → controller → Drizzle → D1).
+- **`blly.to`**:
+  - request matches a **static asset** (`/`, `/assets/*`, `/favicon.ico`, …) → served directly from the assets binding (the landing SPA). `index.html` serves `/`.
+  - otherwise (e.g. `/:code`) → the **Worker runs as the fallback** → D1 lookup → 302 redirect; unknown code → 404 (or the landing 404).
 
-> **Topology change to flag:** today the redirect and the API are **co-hosted on one origin** — `web/.env` sets `VITE_API_URL=http://localhost:3000/api/v1` and `VITE_BASE_SHORT_URL=http://localhost:3000` (same origin), and `app.js` mounts redirect at `app.use('/', …)`. Splitting onto two hostnames means **both** `VITE_API_URL` and `VITE_BASE_SHORT_URL` change, and `createLink`'s `shortUrl` (`${BASE_SHORT_URL}/${code}`) must be built from the **short** domain var. This is a deliberate change, not "contract-identical hosting."
+> **Asset-vs-code precedence (gotcha):** configure assets so the **Worker is invoked for non-asset paths** — i.e. do **not** use `not_found_handling: "single-page-application"` on the apex (it would serve `index.html` for `/:code` and the redirect would never run). The landing is effectively a single route (`/`) plus static files, so SPA-fallback is unnecessary here. The management app's client-side routes live on `app.blly.to` (Pages), not the apex.
+
+> **Topology change to flag:** today redirect + API + landing are **co-hosted on one origin** — `web/.env` sets `VITE_API_URL=http://localhost:3000/api/v1` and `VITE_BASE_SHORT_URL=http://localhost:3000` (same origin); `app.js` mounts redirect at `app.use('/', …)`. After migration: `VITE_API_URL`→`https://api.blly.to/api/v1`, `VITE_BASE_SHORT_URL`→`https://blly.to`, and `createLink`'s `shortUrl` (`${BASE_SHORT_URL}/${code}`) is built from the **apex** var.
 
 ### 4.3 Request flow
 
 ```
-Client ─> Worker (Hono)
-            ├─ host = short domain ─> redirect handler ─> D1 lookup ─> 302
-            │       └─ executionCtx.waitUntil(try { db.batch([UPDATE count, INSERT log]) } catch {})
-            └─ host = api domain ─> CORS ─> /api/v1/* ─> auth ─> controller ─> Drizzle ─> D1
+Client ─> Worker (routes: api.blly.to/*, blly.to/*)
+            ├─ host = api.blly.to ─> CORS ─> /api/v1/* ─> auth ─> controller ─> Drizzle ─> D1
+            └─ host = blly.to
+                 ├─ path matches a static asset ─> Static Assets (landing SPA)
+                 └─ else (/:code) ─> redirect handler ─> D1 lookup ─> 302
+                          └─ executionCtx.waitUntil(try { db.batch([UPDATE count, INSERT log]) } catch {})
 ```
 
 ## 5. D1 Schema
@@ -143,12 +159,13 @@ CREATE TABLE links (
 CREATE INDEX idx_links_created_by ON links(created_by);
 CREATE INDEX idx_links_created_at ON links(created_at);
 
--- api_keys  (ApiKey model)  — plaintext key preserved (see §7.3)
+-- api_keys  (ApiKey model)  — hash + prefix + show-once (see §7.3)
 CREATE TABLE api_keys (
   id           TEXT PRIMARY KEY,
   user_id      TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   key_name     TEXT NOT NULL,
-  api_key      TEXT NOT NULL UNIQUE,                -- "ak_live_<40 chars [a-zA-Z0-9]>"
+  key_hash     TEXT NOT NULL UNIQUE,                -- SHA-256 hex of the full key (auth lookup)
+  key_prefix   TEXT NOT NULL,                       -- non-secret display/search token, e.g. "ak_live_a1b2c3"
   scopes       TEXT NOT NULL DEFAULT '{"links":"read","stats":"read"}',  -- JSON
   status       TEXT NOT NULL DEFAULT 'active'
                CHECK (status IN ('active','inactive','expired','revoked')),
@@ -159,6 +176,7 @@ CREATE TABLE api_keys (
   updated_at   TEXT NOT NULL
 );
 CREATE INDEX idx_api_keys_user ON api_keys(user_id);
+CREATE INDEX idx_api_keys_prefix ON api_keys(key_prefix);  -- prefix search/display
 
 -- redirect_logs  (RedirectLog model; field "link" → link_id)  — adds country + city
 CREATE TABLE redirect_logs (
@@ -177,7 +195,7 @@ CREATE INDEX idx_redirect_logs_created_at ON redirect_logs(created_at);
 
 **Constraint provenance (deliberate vs. inherited):**
 - `account_type` / `status` CHECKs mirror the Mongoose `enum` sets exactly (verified) — no tightening.
-- Mongoose `ApiKey` had a `sparse` unique index on `apiKey`; here `api_key` is always set, so `NOT NULL UNIQUE` is equivalent in practice (no nulls to make sparse). Noted.
+- Mongoose `ApiKey` had a `sparse` unique index on the plaintext `apiKey`; that column is **replaced** by `key_hash` (SHA-256, always set → `NOT NULL UNIQUE`) plus a non-secret `key_prefix` (§7.3). This is the one deliberate schema/contract change.
 - `links.title`/`description` stay nullable with no default to match Mongoose; `createLink` inserting `undefined` must yield `NULL`, and the create response omits absent title/description (§9).
 
 ## 6. Response contract & serialization (binding constraint)
@@ -213,7 +231,7 @@ All API JSON keys remain **camelCase** regardless of snake_case columns: `destin
 | `mongoose` | `drizzle-orm` + D1 binding (`env.DB`) | schema-as-code; camelCase↔snake_case mapping |
 | `jsonwebtoken` | **`jose`** | see §7.4 — hono/jwt lacks `expiresIn`/auto-`iat`; jose mirrors `jsonwebtoken` |
 | `bcryptjs` | **WebCrypto PBKDF2** (`lib/password.ts`) | §7.1; greenfield → no hash compatibility needed |
-| `crypto.randomBytes` (`genKey`) | `crypto.getRandomValues` | §7.2; preserve `ak_live_` + 40 chars `[a-zA-Z0-9]` |
+| `crypto.randomBytes` (`genKey`) | `crypto.getRandomValues` + `crypto.subtle.digest` | §7.2; `ak_live_`+40 chars, then SHA-256 hash + prefix (§7.3) |
 | `geoip-lite` (analytics country **and city**) | `request.cf.country` + `request.cf.city` | §7.5; stored at write time; keep `COUNTRY_NAMES` ISO→name map |
 | `nanoid` v3 | `nanoid` (ESM build) | §7.6; preserve `nanoid(7)` with the **default URL-safe alphabet** (incl. `-`,`_`) |
 | **`http`/`https` + streams** (`fetchPageMeta`) | **global `fetch()`** | §7.7 — CRITICAL; `nodejs_compat` does **not** polyfill outbound `http.request` |
@@ -230,11 +248,20 @@ PBKDF2 via `crypto.subtle` (SHA-256, random 16-byte salt, **100 000 iterations**
 
 ### 7.2 API-key generation (`lib/keys.ts`)
 
-`ak_live_` + 40 chars from `[a-zA-Z0-9]`, using `crypto.getRandomValues(new Uint8Array(40))` (replacing `crypto.randomBytes`). Format preserved exactly.
+Generate the full key as `ak_live_` + 40 chars from `[a-zA-Z0-9]` via `crypto.getRandomValues(new Uint8Array(40))` (same format as today). Then derive:
+- `keyHash` = SHA-256 hex of the full key (`crypto.subtle.digest('SHA-256', …)`) → stored in `key_hash`, used for auth lookup.
+- `keyPrefix` = the first 14 chars (`ak_live_` + 6) → stored in `key_prefix`, shown to the user (e.g. `ak_live_a1b2c3`).
 
-### 7.3 API-key storage — plaintext preserved (contract constraint)
+`generate()` returns `{ fullKey, keyHash, keyPrefix }`. The **`fullKey` is returned to the client exactly once** (creation/regeneration) and never persisted in plaintext.
 
-Today the plaintext key is **returned and searched**: `GET /auth/api-key` returns `apiKey`; `listKeys` returns `apiKey` per row and does substring search over it; `formatKey` includes `apiKey`. Therefore `api_keys.api_key` stores **plaintext** (unique-indexed) and auth looks it up directly. Consequence: `LIKE '%term%'` search can't use the index (full table scan) — acceptable at low key counts, scoped per user. Hashing (show-once) is the documented future fix (§13).
+### 7.3 API-key storage — hash + prefix + show-once (deliberate contract change)
+
+Replaces the previous plaintext storage. The full key is **shown once** at creation/regeneration; thereafter only the non-secret `key_prefix` is retrievable. Auth hashes the incoming `x-api-key` (SHA-256) and looks it up by `key_hash` (indexed, constant-work). Search/display operate on `key_prefix` + `key_name`.
+
+**Contract impact (drives the §15 frontend sub-project):**
+- `POST /api/v1/api-keys` and `POST /auth/api-key/regenerate` responses include the **full key once** (in the existing `apiKey` field) — these paths keep working as-is on the frontend's "just created, copy it now" UI.
+- `GET /auth/api-key`, `GET /api/v1/api-keys` (`listKeys`), and `formatKey` **no longer return the full key**: they return `keyPrefix` (e.g. shown masked as `ak_live_a1b2c3••••`). The management-app UI must switch from displaying/copying the full key on demand to **prefix + a show-once-on-create modal**.
+- This is the single intentional deviation from "preserve contract" and is the standard pattern (GitHub/Stripe). Prefix `LIKE` search uses `idx_api_keys_prefix`.
 
 ### 7.4 JWT (`lib/jwt.ts`)
 
@@ -256,7 +283,7 @@ Rewrite `fetchPageMeta` with `fetch(url, { redirect:'follow', headers, signal: A
 
 ### 8.1 `auth` middleware — JWT **and** API key (behavior preserved)
 
-- `x-api-key` present → look up `api_keys.api_key`, join user. Reject with existing codes (`AUTH_INVALID_API_KEY`, `AUTH_API_KEY_REVOKED`, `AUTH_API_KEY_INACTIVE`, `AUTH_API_KEY_EXPIRED`); on expiry set `status='expired'`; update `last_used_at` non-blocking (`waitUntil`). Sets `req.user = { id, email, fullName }`.
+- `x-api-key` present → **SHA-256 the incoming key** and look up `api_keys.key_hash` (§7.3), join user. Reject with existing codes (`AUTH_INVALID_API_KEY`, `AUTH_API_KEY_REVOKED`, `AUTH_API_KEY_INACTIVE`, `AUTH_API_KEY_EXPIRED`); on expiry set `status='expired'`; update `last_used_at` non-blocking (`waitUntil`). Sets `req.user = { id, email, fullName }`.
 - Else `Authorization: Bearer <jwt>` → verify; sets `req.user = { id, iat, exp }`. Missing/invalid → `AUTH_NO_TOKEN`/`AUTH_INVALID_TOKEN`.
 - **Known asymmetry (preserved verbatim):** the JWT path's `req.user` has no `email`/`fullName`. Controllers rely only on `req.user.id`; preserve as-is.
 
@@ -269,10 +296,10 @@ The middleware exists and is ported, but **no route applies it today** (verified
 All paths/response shapes identical to today; errors via ported `errorCodes` except the ad-hoc bodies in §6.4.
 
 **auth** (`/api/v1/auth`) — `POST /register`, `POST /login` (status gates → `AUTH_ACCOUNT_INACTIVE`/`_SUSPENDED`/`_PENDING`), `GET /me` *(auth, §6.3)*, `PUT /profile`, `PUT /change-password` (min 6 → `AUTH_WEAK_PASSWORD`; wrong current → `AUTH_WRONG_PASSWORD`), `GET /api-key`, `POST /api-key/regenerate`.
-- **`GET /api-key` returns the newest key for the user with NO `isPersonal` filter** (current behavior — do **not** add `WHERE is_personal=1`). Shape: `{ hasKey, keyId, apiKey, apiKeyStatus, apiKeyExpiresAt }`.
-- `regenerate`: delete the user's personal keys, create `Personal` (scopes `{links:'write',stats:'read'}`, `isPersonal:1`).
+- **`GET /api-key` returns the newest key for the user with NO `isPersonal` filter** (current behavior — do **not** add `WHERE is_personal=1`). Shape (hash+prefix change, §7.3): `{ hasKey, keyId, keyPrefix, apiKeyStatus, apiKeyExpiresAt }` — `keyPrefix` replaces the old full `apiKey` (full key is not retrievable).
+- `regenerate`: delete the user's personal keys, create `Personal` (scopes `{links:'write',stats:'read'}`, `isPersonal:1`); response returns the **full key once** in `apiKey` plus `keyPrefix`.
 
-**links** (`/api/v1/links`, all *auth*) — `GET /analytics`, `GET /meta` (§7.7), `GET /` (list by `createdBy`, newest first), `POST /` (create; `LINK_MISSING_URL`; auto-fetch meta when title/description blank; `shortUrl` from short domain; 201), `GET /code/:code`, `PUT /:id` (`LINK_CODE_EXISTS` on dup), `DELETE /:id`, `GET /:id/logs` (newest 200), `GET /:id/analytics`.
+**links** (`/api/v1/links`, all *auth*) — `GET /analytics`, `GET /meta` (§7.7), `GET /` (list by `createdBy`, newest first), `POST /` (create; `LINK_MISSING_URL`; auto-fetch meta when title/description blank; `shortUrl` from the apex (`https://blly.to/${code}`); 201), `GET /code/:code`, `PUT /:id` (`LINK_CODE_EXISTS` on dup), `DELETE /:id`, `GET /:id/logs` (newest 200), `GET /:id/analytics`.
 - **`DELETE /:id` accepts id OR code**: current code uses a 24-hex-ObjectId regex to disambiguate. With UUID `TEXT` ids, switch the test to a **UUID-shape check** (else treat as `code` scoped to `createdBy`); also cascade-delete `redirect_logs` (handled by FK `ON DELETE CASCADE`).
 - `deleteLinkByCode` is **dead code** (no route) — do **not** port.
 
@@ -280,18 +307,20 @@ All paths/response shapes identical to today; errors via ported `errorCodes` exc
 
 **roles** (`/api/v1/roles`, *auth*) — `GET /` (each role includes computed **`userCount`** → `COUNT` over `user_roles GROUP BY role_id`), `POST /` (**quirk: missing `name` → `ROLE_NAME_EXISTS` (400)** — preserve verbatim), `PUT /:id`, `DELETE /:id` (also `$pull` roles from users → `DELETE FROM user_roles WHERE role_id=?`).
 
-**api-keys** (`/api/v1/api-keys`, *auth*) — `GET /` (paginated `search,status,page,limit`; substring `LIKE` over keyName+apiKey = per-user table scan, acceptable), `POST /`, `GET /:id/stats` (7-day timeline + device buckets + totals → SQL/JS aggregates), `PUT /:id`, `DELETE /:id`. Not-found/validation use the ad-hoc bodies in §6.4.
+**api-keys** (`/api/v1/api-keys`, *auth*) — `GET /` (paginated `search,status,page,limit`; substring `LIKE` over `key_name` + `key_prefix` — full key is not stored, §7.3), `POST /` (returns **full key once** in `apiKey` + `keyPrefix`), `GET /:id/stats` (7-day timeline + device buckets + totals → SQL/JS aggregates), `PUT /:id`, `DELETE /:id`. `formatKey` returns `keyPrefix` (masked), never the full key. Not-found/validation use the ad-hoc bodies in §6.4.
 
 **shorten** — `POST /api/v1/shorten` *(auth)* → `createLink`.
 
-**redirect** — `GET /:code` (public, short domain only).
+**redirect** — `GET /:code` (public, apex `blly.to` only; non-asset paths, §4.2).
 
 > **Mongo→SQL rewrites required:** `$inc` (click count), `$in`, `populate` (joins), `countDocuments`, `sort/skip/limit`, `$regex` (→`LIKE`), `$or`, `$pull` (→`DELETE`), aggregate `userCount`, `getAnalytics`/`getKeyStats` timeline+device+geo aggregation, and `err.code===11000` (→ UNIQUE-message match, §14).
 
 ## 10. Redirect path (D1 MVP)
 
+Runs only when the apex request is **not** a static asset (§4.2) — assets are served first; the Worker is the fallback for `/:code`.
+
 ```
-GET /:code  (short domain)
+GET /:code  (blly.to, non-asset path)
   1. SELECT * FROM links WHERE code = ? AND is_active = 1
        └─ none           → LINK_NOT_FOUND
        └─ expires_at past → LINK_EXPIRED
@@ -330,32 +359,38 @@ A seed step (SQL seed or `wrangler d1 execute`, run once after migrations) creat
 - **KV redirect cache** (`code → {destinationUrl,isActive,expiresAt}`) for <10 ms global lookups; can split redirect into its own Worker.
 - **Analytics Engine** to replace per-redirect `redirect_logs` inserts; derive counts/timelines from AE.
 - **Durable Object** per-link counter for strongly-consistent clicks.
-- **API-key hashing** (store SHA-256, show plaintext once) — requires frontend changes (no retrieval/substring search).
 - **Backend RBAC enforcement** (wire `checkPermission` into routes).
-- **SSRF hardening** of the metadata fetch.
+- **SSRF hardening** of the metadata fetch (block internal/metadata IP ranges).
+- **API-key rotation/scoping UX** improvements (hashing itself is now in scope, §7.3).
 
 ## 14. Risks & gotchas
 
 - **Worker CPU** — PBKDF2 at 100k iterations; bcrypt avoided.
 - **No Node built-ins** — `http`/`https`/streams/`Buffer`/`fs`/`crypto.randomBytes`/`geoip-lite` removed; use `fetch`/WebCrypto/`request.cf`. **No `nodejs_compat` needed** post-rewrite (and it would not fix `fetchPageMeta`).
 - **Foreign keys on D1** — enforced by default (equivalent to `PRAGMA foreign_keys=on`); cannot be toggled per query (implicit transactions). For drizzle-kit **table-rebuild** migrations that reorder FKs, wrap with `PRAGMA defer_foreign_keys = on;` (resolved by migration end) to avoid `FOREIGN KEY constraint failed`.
-- **UNIQUE violations** — detect by matching the thrown message `UNIQUE constraint failed: <table>.<col>` (not Mongo `err.code===11000`); map `users.email`→`AUTH_EMAIL_EXISTS`, `links.code`→`LINK_CODE_EXISTS`, `api_keys.api_key`→duplicate.
+- **UNIQUE violations** — detect by matching the thrown message `UNIQUE constraint failed: <table>.<col>` (not Mongo `err.code===11000`); map `users.email`→`AUTH_EMAIL_EXISTS`, `links.code`→`LINK_CODE_EXISTS`, `api_keys.key_hash`→duplicate.
+- **Static Assets vs redirect precedence** — on `blly.to` the Worker must run for `/:code`; do not enable SPA-fallback `not_found_handling` on the apex or the redirect never fires (§4.2). Verify a fresh code path is NOT shadowed by an asset name.
 - **SQLite typing** — booleans 0/1, dates ISO text; Drizzle column modes set accordingly; insert of `undefined` on nullable `links.title/description` must store `NULL`.
 - **Drizzle workflow** — use `drizzle-kit generate` + `wrangler d1 migrations apply` (no `driver:'d1-http'`/API token needed); don't mix with the HTTP push/studio flow.
 - **D1 free-tier limits** — 500 MB DB, 1 MB row; `redirect_logs` is the growth driver → revisit Analytics Engine before scale.
 - **`request.cf` absent locally** — country/city null under `wrangler dev` without `--remote`.
 - **Contract drift is the top risk** — every `_id`/camelCase/envelope/ad-hoc-body detail in §6 is a runtime break if missed; §12 tests must assert exact shapes.
 
-## 15. Frontend → Pages (separate sub-project — summary only)
+## 15. Frontend sub-project (separate spec/plan — summary only)
 
-Tracked as its own spec/plan. Scope: build the Vue SPA (Vite) and deploy to Cloudflare Pages; set `VITE_API_URL` → new API domain and `VITE_BASE_SHORT_URL` → new short domain; register the Pages origin in the API's CORS allowlist. No shared code with the backend; depends on this spec's API being deployed.
+Tracked as its own spec/plan. The Vue app feeds **two** deploy targets:
+- **Landing build → `api/public`** (this Worker's Static Assets, served at `blly.to/`, §4.2). The backend deploy depends on this build artifact existing.
+- **Management app → Cloudflare Pages on `app.blly.to`.**
 
-## 16. Rollout (backend, this spec)
+Frontend changes required: set `VITE_API_URL` → `https://api.blly.to/api/v1` and `VITE_BASE_SHORT_URL` → `https://blly.to`; register `https://app.blly.to` in the API's CORS allowlist; and **update the API-key UI** to the hash+prefix+show-once model (§7.3) — display `keyPrefix` (masked), show the full key only in a one-time modal right after create/regenerate, and search by prefix/name. No other API-consumer changes.
 
-1. Scaffold Worker (`api/`): Hono + Drizzle + `wrangler.jsonc` (D1 binding, routes for short + API domains, `JWT_SECRET` secret, `BASE_SHORT_URL` var, CORS origin).
+## 16. Rollout (this spec)
+
+1. Scaffold Worker (`api/`): Hono + Drizzle + `wrangler.jsonc` (D1 binding, **Static Assets binding → `api/public`**, routes `api.blly.to/*` + `blly.to/*`, `JWT_SECRET` secret, `BASE_SHORT_URL` var, CORS origin `https://app.blly.to`).
 2. `db/schema.ts` + `drizzle-kit generate` → apply `--local` then `--remote`.
-3. Port `errorCodes` (map verbatim, helpers re-signatured), `lib/*` (password, jwt/jose, keys, meta), middleware, controllers, serializers, routes.
+3. Port `errorCodes` (map verbatim, helpers re-signatured), `lib/*` (password, jwt/jose, keys+hash, meta), middleware, controllers, serializers, routes.
 4. Seed admin role (full matrix) + admin user.
-5. Tests green (vitest-pool-workers, exact-shape assertions) + `wrangler dev` smoke test.
-6. Deploy Worker; bind short + API domains.
-7. Verify; then decommission Vercel API + Atlas. (Frontend re-point + Pages deploy handled in §15's sub-project.)
+5. Drop the landing build into `api/public` (from §15) so the apex serves it.
+6. Tests green (vitest-pool-workers, exact-shape assertions) + `wrangler dev` smoke test.
+7. Deploy Worker; bind `api.blly.to` + `blly.to` routes. Verify `/` (landing), `/:code` (redirect), `/api/v1/*` (API).
+8. Verify; then decommission Vercel API + Atlas. (Management app → Pages handled in §15's sub-project.)
