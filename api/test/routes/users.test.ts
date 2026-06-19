@@ -27,6 +27,7 @@ describe('users routes', () => {
     await app.request('/api/v1/users', post({ email: 'findme@x.co', password: 'pw123456' }), env);
     const res = await app.request('/api/v1/users?search=findme', { headers: authH() }, env);
     const b = await res.json() as any;
+    expect(b.data.length).toBeGreaterThan(0);
     expect(b.data.every((u: any) => u.email.includes('findme'))).toBe(true);
   });
   it('create hashes password, attaches roles, rejects duplicate email', async () => {

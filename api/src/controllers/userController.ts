@@ -28,8 +28,8 @@ async function rolesByUser(db: DB, userIds: string[]) {
 
 export const getUsers = async (c: C) => {
   const db = getDb(c.env);
-  const page = Number(c.req.query('page') || 1);
-  const limit = Number(c.req.query('limit') || 10);
+  const page = Math.max(1, Number(c.req.query('page') || 1));
+  const limit = Math.max(1, Number(c.req.query('limit') || 10));
   const search = c.req.query('search') || '';
   const status = c.req.query('status') || '';
   const conds = [] as any[];
@@ -38,7 +38,7 @@ export const getUsers = async (c: C) => {
   const where = conds.length ? and(...conds) : undefined;
   const totalRow = await db.select({ n: sql<number>`count(*)` }).from(users).where(where).get();
   const total = totalRow?.n ?? 0;
-  const rows = await db.select().from(users).where(where).orderBy(desc(users.createdAt)).limit(limit).offset((page - 1) * limit).all();
+  const rows = await db.select({ id: users.id, fullName: users.fullName, email: users.email, accountType: users.accountType, status: users.status, createdAt: users.createdAt }).from(users).where(where).orderBy(desc(users.createdAt)).limit(limit).offset((page - 1) * limit).all();
   const map = await rolesByUser(db, rows.map((r) => r.id));
   return ok(c, { data: rows.map((u) => toUserAdmin(u, map.get(u.id) || [])), pagination: { total, page, limit, pages: Math.ceil(total / limit) } });
 };
