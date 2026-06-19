@@ -221,7 +221,7 @@ All API JSON keys remain **camelCase** regardless of snake_case columns: `destin
 
 ### 6.4 JSON envelope & ad-hoc error bodies
 
-- Standard envelope via `ok()`/`fail()`: success `{ success: true, ...data }` with `status`; error `{ success: false, error: { code, message } }` with the code's `status`. The `ERRORS` map ports **verbatim**, but `ok`/`fail` are **re-signatured for Hono** (`c.json(body, status)` instead of `res.status().json()`).
+- Standard envelope via `ok()`/`fail()` — **flat, matching OLD `errorCodes.js` exactly**: success `{ success: true, ...data }` with `status`; error `{ success: false, errorCode: <code>, message: <message> }` with the code's `status`. (Note: the error body is FLAT — top-level `errorCode` + `message`, NOT a nested `error` object — the live frontend reads `errorCode`/`message`.) The `ERRORS` map ports **verbatim**; `ok`/`fail` are **re-signatured for Hono** (`c.json(body, status)` instead of `res.status().json()`) but the body shape is identical.
 - **Non-`errorCodes` responses must be reproduced byte-for-byte** (they have no `code` field): `createKey` missing keyName → `{success:false, message:'keyName is required'}` (400); `updateKey`/`deleteKey`/`getKeyStats` not-found → `{success:false, message:'API Key not found'}` (404). Decision: **preserve verbatim** (do not normalize) to keep the contract.
 
 ## 7. Library migration (Node → Workers-native)
