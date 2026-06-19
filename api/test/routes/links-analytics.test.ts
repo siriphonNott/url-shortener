@@ -28,9 +28,12 @@ describe('links analytics', () => {
     expect(b.trafficType).toMatchObject({ direct: 1, qr: 0, referral: 1 });
     expect(b.locations.countries.find((x: any) => x.name === 'Thailand')).toBeTruthy();
     expect(b.locations.cities.find((x: any) => x.name === 'Bangkok')).toBeTruthy();
+    expect(b.timeline[0]).toMatchObject({ qrScans: 0 });
+    expect(b.timeline[0]).toHaveProperty('linksCreated');
   });
   it('getLogs returns logs with _id and userAgent', async () => {
     const res = await app.request('/api/v1/links/al1/logs', { headers: authH() }, env);
+    expect(res.status).toBe(200);
     const b = await res.json() as any;
     expect(b.data[0]).toHaveProperty('_id');
     expect(b.data[0]).toHaveProperty('userAgent');
@@ -40,14 +43,17 @@ describe('links analytics', () => {
     const b = await res.json() as any;
     expect(b.link).toMatchObject({ code: 'aco', totalClicks: 2 });
     expect(b.timeline).toHaveLength(7);
+    expect(Object.keys(b.timeline[0]).sort()).toEqual(['clicks', 'date']);
   });
   it('getLogs denies access to another user link (IDOR)', async () => {
     const res = await app.request('/api/v1/links/ol1/logs', { headers: authH() }, env);
+    expect(res.status).toBe(404);
     const b = await res.json() as any;
     expect(b.errorCode).toBe('LINK_NOT_FOUND');
   });
   it('getLinkAnalytics denies access to another user link (IDOR)', async () => {
     const res = await app.request('/api/v1/links/ol1/analytics', { headers: authH() }, env);
+    expect(res.status).toBe(404);
     const b = await res.json() as any;
     expect(b.errorCode).toBe('LINK_NOT_FOUND');
   });
