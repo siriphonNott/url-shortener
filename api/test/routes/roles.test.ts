@@ -44,4 +44,14 @@ describe('roles routes', () => {
     const u = await app.request(`/api/v1/roles/${id}`, { method: 'PUT', headers: { 'content-type': 'application/json', ...authH() }, body: '{}' }, env);
     expect((await u.json() as any).errorCode).toBe('ROLE_NOT_FOUND');
   });
+  it('list reflects userCount > 0 after a user_roles row is added', async () => {
+    const c = await app.request('/api/v1/roles', post({ name: 'counted' }), env);
+    const id = (await c.json() as any).data._id;
+    await env.DB.prepare("INSERT INTO user_roles (user_id,role_id) VALUES ('ra',?)").bind(id).run();
+    const list = await app.request('/api/v1/roles', { headers: authH() }, env);
+    const lb = await list.json() as any;
+    const role = lb.data.find((r: any) => r._id === id);
+    expect(role).toBeTruthy();
+    expect(role.userCount).toBe(1);
+  });
 });
