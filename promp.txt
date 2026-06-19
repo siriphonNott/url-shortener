@@ -1,0 +1,20 @@
+ช่วยสร้างโปรเจค microservice สร้างทำ Short link โดยมีฟีเจอร์ดังนี้
+    1. สร้าง short link
+    2. redirect link
+    3. ดึงข้อมูลทั้งหมดของ short link ที่สร้างไว้
+    4. แก้ไขข้อมูล short link
+    5. ลบข้อมูล short link
+    6. มี log การ redirect link
+    7. มีหน้าเว็บสำหรับใช้จัดการ เพิ่ม ลด แก้ไข ข้อมูลได้ 
+
+เงื่อนไขการใช้งาน
+    1. ต้อง auth ก่อนถึงจะสามารถใช้งานกาจัดการ link ได้
+    2. เส้น redirect link ไม่ต้อง auth 
+
+เครื่องมือการพัฒนา
+    1. Express.js
+    2. MongoDB Atlas 
+    3. Vue.js
+    4. Deploy to vercel
+
+
