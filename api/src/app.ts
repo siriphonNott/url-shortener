@@ -8,8 +8,11 @@ import { roleRoutes } from './routes/roles';
 import { apiKeyRoutes } from './routes/apiKeys';
 import { createLink } from './controllers/linkController';
 import { auth } from './middleware/auth';
+import { fail } from './lib/errorCodes';
 
 export const app = new Hono<AppBindings>();
+
+app.onError((_err, c) => fail(c, 'SERVER_ERROR'));
 
 app.use('/api/v1/*', cors({ origin: ['https://app.blly.to', 'http://localhost:5173'] }));
 

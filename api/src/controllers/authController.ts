@@ -14,7 +14,7 @@ type C = Context<AppBindings>;
 const uuid = () => crypto.randomUUID();
 
 export const register = async (c: C) => {
-  const { email, password } = await c.req.json().catch(() => ({}));
+  const { email, password } = (await c.req.json().catch(() => ({}))) ?? {};
   if (!email || !password) return fail(c, 'AUTH_MISSING_FIELDS');
   const db = getDb(c.env);
   const id = uuid(); const now = nowIso();
@@ -29,7 +29,7 @@ export const register = async (c: C) => {
 };
 
 export const login = async (c: C) => {
-  const { email, password } = await c.req.json().catch(() => ({}));
+  const { email, password } = (await c.req.json().catch(() => ({}))) ?? {};
   if (!email || !password) return fail(c, 'AUTH_MISSING_FIELDS');
   const db = getDb(c.env);
   const u = await db.select().from(users).where(eq(users.email, String(email).toLowerCase())).get();
@@ -51,7 +51,7 @@ export const me = async (c: C) => {
 };
 
 export const updateProfile = async (c: C) => {
-  const { fullName } = await c.req.json().catch(() => ({}));
+  const { fullName } = (await c.req.json().catch(() => ({}))) ?? {};
   const db = getDb(c.env);
   const id = c.get('user').id;
   await db.update(users).set({ fullName: (fullName ?? '').trim(), updatedAt: nowIso() }).where(eq(users.id, id));
@@ -60,7 +60,7 @@ export const updateProfile = async (c: C) => {
 };
 
 export const changePassword = async (c: C) => {
-  const { currentPassword, newPassword } = await c.req.json().catch(() => ({}));
+  const { currentPassword, newPassword } = (await c.req.json().catch(() => ({}))) ?? {};
   if (!currentPassword || !newPassword) return fail(c, 'AUTH_MISSING_PW_FIELDS');
   if (newPassword.length < 6) return fail(c, 'AUTH_WEAK_PASSWORD');
   const db = getDb(c.env);

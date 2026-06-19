@@ -1,4 +1,5 @@
-import { sqliteTable, text, integer, primaryKey, index } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, primaryKey, index, check } from 'drizzle-orm/sqlite-core';
+import { sql } from 'drizzle-orm';
 
 export const users = sqliteTable('users', {
   id: text('id').primaryKey(),
@@ -9,7 +10,11 @@ export const users = sqliteTable('users', {
   status: text('status').notNull().default('active'),
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
-});
+// NOTE: migration drizzle/0000_*.sql already contains these inline and is authoritative for the existing DB; this aligns the Drizzle source so future drizzle-kit generate agrees.
+}, (t) => ({
+  accountTypeCheck: check('users_account_type_check', sql`${t.accountType} in ('free','premium','enterprise')`),
+  statusCheck: check('users_status_check', sql`${t.status} in ('active','inactive','suspended','pending_verification')`),
+}));
 
 export const roles = sqliteTable('roles', {
   id: text('id').primaryKey(),
@@ -61,6 +66,8 @@ export const apiKeys = sqliteTable('api_keys', {
 }, (t) => ({
   byUser: index('idx_api_keys_user').on(t.userId),
   byPrefix: index('idx_api_keys_prefix').on(t.keyPrefix),
+  // NOTE: migration drizzle/0000_*.sql already contains this inline and is authoritative for the existing DB; this aligns the Drizzle source so future drizzle-kit generate agrees.
+  statusCheck: check('api_keys_status_check', sql`${t.status} in ('active','inactive','expired','revoked')`),
 }));
 
 export const redirectLogs = sqliteTable('redirect_logs', {

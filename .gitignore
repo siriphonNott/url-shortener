@@ -39,3 +39,6 @@ web/.vite/
 
 # Vercel
 .vercel
+
+# Wrangler local state
+api/.wrangler/

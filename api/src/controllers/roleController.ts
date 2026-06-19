@@ -20,7 +20,7 @@ export const getRoles = async (c: C) => {
 };
 
 export const createRole = async (c: C) => {
-  const { name, description, permissions } = await c.req.json().catch(() => ({}));
+  const { name, description, permissions } = (await c.req.json().catch(() => ({}))) ?? {};
   if (!name) return fail(c, 'ROLE_NAME_EXISTS'); // preserved quirk
   const db = getDb(c.env);
   const id = uuid(); const now = nowIso();
@@ -35,7 +35,7 @@ export const createRole = async (c: C) => {
 };
 
 export const updateRole = async (c: C) => {
-  const { name, description, permissions } = await c.req.json().catch(() => ({}));
+  const { name, description, permissions } = (await c.req.json().catch(() => ({}))) ?? {};
   const db = getDb(c.env);
   const set: Record<string, unknown> = { updatedAt: nowIso() };
   if (name !== undefined) set.name = name;

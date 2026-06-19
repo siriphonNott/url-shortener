@@ -37,6 +37,13 @@ describe('auth routes', () => {
     const res = await app.request('/api/v1/auth/login', json({ email: 'log2@x.com', password: 'nope' }), env);
     expect((await res.json() as any).errorCode).toBe('AUTH_INVALID_CREDENTIALS');
   });
+  it('null JSON body is handled (flat envelope, not 500)', async () => {
+    const res = await app.request('/api/v1/auth/register', { method: 'POST', headers: { 'content-type': 'application/json' }, body: 'null' }, env);
+    const b = await res.json() as any;
+    expect(res.status).toBe(400);
+    expect(b.success).toBe(false);
+    expect(b.errorCode).toBe('AUTH_MISSING_FIELDS');
+  });
   it('regenerate then getApiKey returns prefix only (no full key)', async () => {
     const reg = await app.request('/api/v1/auth/register', json({ email: 'key@x.com', password: 'pw123456' }), env);
     const token = (await reg.json() as any).token;

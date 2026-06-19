@@ -22,7 +22,7 @@ export const getLinks = async (c: C) => {
 };
 
 export const createLink = async (c: C) => {
-  const body = await c.req.json().catch(() => ({}));
+  const body = (await c.req.json().catch(() => ({}))) ?? {};
   const { destinationUrl, code, expiresAt } = body;
   let { title, description } = body;
   if (!destinationUrl) return fail(c, 'LINK_MISSING_URL');
@@ -50,7 +50,7 @@ export const createLink = async (c: C) => {
 };
 
 export const updateLink = async (c: C) => {
-  const body = await c.req.json().catch(() => ({}));
+  const body = (await c.req.json().catch(() => ({}))) ?? {};
   const { title, description, destinationUrl, code, isActive, expiresAt } = body;
   // Guard each field: only write provided keys (destinationUrl is NOT NULL — never overwrite with undefined).
   const set: Record<string, unknown> = { updatedAt: nowIso() };

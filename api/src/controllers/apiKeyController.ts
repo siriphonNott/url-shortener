@@ -15,8 +15,8 @@ const dayOf = (iso: string) => iso.split('T')[0];
 
 export const listKeys = async (c: C) => {
   const db = getDb(c.env);
-  const page = Number(c.req.query('page') || 1);
-  const limit = Number(c.req.query('limit') || 20);
+  const page = Math.max(1, Number(c.req.query('page') || 1));
+  const limit = Math.max(1, Number(c.req.query('limit') || 20));
   const search = c.req.query('search') || '';
   const status = c.req.query('status') || '';
   const conds = [] as any[];
@@ -36,7 +36,7 @@ export const listKeys = async (c: C) => {
 };
 
 export const createKey = async (c: C) => {
-  const { keyName, userId, scopes, expiresAt } = await c.req.json().catch(() => ({}));
+  const { keyName, userId, scopes, expiresAt } = (await c.req.json().catch(() => ({}))) ?? {};
   if (!keyName) return adhoc(c, 'keyName is required', 400);
   const db = getDb(c.env);
   const targetUserId = userId || c.get('user').id;
@@ -50,7 +50,7 @@ export const createKey = async (c: C) => {
 };
 
 export const updateKey = async (c: C) => {
-  const { keyName, scopes, status, expiresAt } = await c.req.json().catch(() => ({}));
+  const { keyName, scopes, status, expiresAt } = (await c.req.json().catch(() => ({}))) ?? {};
   const db = getDb(c.env);
   const set: Record<string, unknown> = { updatedAt: nowIso() };
   if (keyName !== undefined) set.keyName = keyName;

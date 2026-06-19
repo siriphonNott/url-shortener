@@ -44,7 +44,7 @@ export const getUsers = async (c: C) => {
 };
 
 export const createUser = async (c: C) => {
-  const { email, password, fullName, accountType, status, roles: roleIds } = await c.req.json().catch(() => ({}));
+  const { email, password, fullName, accountType, status, roles: roleIds } = (await c.req.json().catch(() => ({}))) ?? {};
   if (!email || !password) return fail(c, 'AUTH_MISSING_FIELDS');
   const db = getDb(c.env);
   const id = uuid(); const now = nowIso(); const lower = String(email).toLowerCase();
@@ -64,7 +64,7 @@ export const createUser = async (c: C) => {
 };
 
 export const updateUser = async (c: C) => {
-  const { fullName, accountType, status, email, roles: roleIds } = await c.req.json().catch(() => ({}));
+  const { fullName, accountType, status, email, roles: roleIds } = (await c.req.json().catch(() => ({}))) ?? {};
   const db = getDb(c.env);
   const id = c.req.param('id');
   const set: Record<string, unknown> = { updatedAt: nowIso() };
