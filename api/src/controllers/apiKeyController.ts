@@ -6,7 +6,6 @@ import { apiKeys, users, links, redirectLogs } from '../db/schema';
 import { ok, fail } from '../lib/errorCodes';
 import { generateKey } from '../lib/keys';
 import { formatKey } from '../serializers';
-import { parseDevice } from '../lib/geo';
 import { last7Days, nowIso } from '../lib/time';
 
 type C = Context<AppBindings>;
