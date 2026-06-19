@@ -8,13 +8,14 @@
   // Do NOT set "single-page-application" here: it would 200 every path and shadow /:code.
   "assets": { "directory": "./public", "binding": "ASSETS" },
   "d1_databases": [
-    // database_id is a placeholder — replace with the real id from `wrangler d1 create blly-db` before any remote/deploy op.
-    { "binding": "DB", "database_name": "blly-db", "database_id": "00000000-0000-0000-0000-000000000000", "migrations_dir": "drizzle" }
+    { "binding": "DB", "database_name": "blly-db", "database_id": "2bad526c-f4af-45f3-ae61-dfacada1cf90", "migrations_dir": "drizzle" }
   ],
-  // Production hostname routes (set the zone before deploy). api.* → Hono API; apex → assets/redirect (see src/index.ts).
+  // Deployed on the eraflow.dev zone (blly.to is not yet in this Cloudflare account).
+  // custom_domain:true makes wrangler auto-provision the proxied DNS record + edge TLS cert.
+  // api.eraflow.dev → Hono API; eraflow.dev (apex) → assets/redirect (see src/index.ts).
   "routes": [
-    { "pattern": "api.blly.to/*", "zone_name": "blly.to" },
-    { "pattern": "blly.to/*", "zone_name": "blly.to" }
+    { "pattern": "api.eraflow.dev", "custom_domain": true },
+    { "pattern": "eraflow.dev", "custom_domain": true }
   ],
-  "vars": { "BASE_SHORT_URL": "https://blly.to" }
+  "vars": { "BASE_SHORT_URL": "https://eraflow.dev" }
 }
