@@ -1,0 +1,14 @@
+{
+  // Management SPA (Vue) served as a static-assets Worker on app.eraflow.dev.
+  // not_found_handling: single-page-application → unmatched routes return index.html
+  // so client-side (history-mode) routing works on refresh/deep-links.
+  "name": "blly-web",
+  "compatibility_date": "2024-09-23",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  },
+  "routes": [
+    { "pattern": "app.eraflow.dev", "custom_domain": true }
+  ]
+}

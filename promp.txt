@@ -12,9 +12,9 @@
     2. เส้น redirect link ไม่ต้อง auth 
 
 เครื่องมือการพัฒนา
-    1. Express.js
-    2. MongoDB Atlas 
-    3. Vue.js
-    4. Deploy to vercel
+    1. API with Express.js
+    2. Use the appropriate database on Cloudflare
+    3. Front with Vue.js
+    4. Deploy to Cloudflare ecosystem
 
 

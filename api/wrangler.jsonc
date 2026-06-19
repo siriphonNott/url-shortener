@@ -1,0 +1,23 @@
+{
+  "name": "blly-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-09-23",
+  "observability": { "enabled": true },
+  // Static Assets: serve ./public on the apex host. NO not_found_handling — the default
+  // returns 404 for unmatched paths, which index.ts treats as a short-code redirect.
+  // Do NOT set "single-page-application" here: it would 200 every path and shadow /:code.
+  "assets": { "directory": "./public", "binding": "ASSETS" },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "blly-db", "database_id": "2bad526c-f4af-45f3-ae61-dfacada1cf90", "migrations_dir": "drizzle" }
+  ],
+  // Deployed on the eraflow.dev zone (blly.to is not yet in this Cloudflare account).
+  // custom_domain:true makes wrangler auto-provision the proxied DNS record + edge TLS cert.
+  // api.eraflow.dev → Hono API; eraflow.dev (apex) → assets/redirect (see src/index.ts).
+  "routes": [
+    { "pattern": "api.eraflow.dev", "custom_domain": true },
+    { "pattern": "eraflow.dev", "custom_domain": true }
+  ],
+  "vars": { "BASE_SHORT_URL": "https://eraflow.dev" },
+  // Local `wrangler dev` only — pin to a fixed port so the web dev proxy (web/vite.config.js) is deterministic.
+  "dev": { "port": 8787 }
+}

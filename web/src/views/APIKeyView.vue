@@ -52,6 +52,21 @@
         </button>
       </div>
 
+      <!-- Existing key (masked — the full key is shown only once at creation) -->
+      <div v-else-if="auth.hasKey" class="space-y-2">
+        <div class="flex items-center gap-2 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3">
+          <code class="flex-1 text-sm font-mono text-gray-800 dark:text-slate-200 break-all select-none tracking-wide">{{ maskedKey }}</code>
+          <span
+            v-if="auth.apiKeyStatus"
+            class="shrink-0 text-[11px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
+            :class="auth.apiKeyStatus === 'active'
+              ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400'
+              : 'bg-gray-200 dark:bg-slate-700 text-gray-500 dark:text-slate-400'"
+          >{{ auth.apiKeyStatus }}</span>
+        </div>
+        <p class="text-xs text-gray-400 dark:text-slate-600">{{ $t('apiKey.maskedNote') }}</p>
+      </div>
+
       <!-- No key yet -->
       <div v-else-if="!loading" class="bg-gray-50 dark:bg-slate-800 border border-dashed border-gray-300 dark:border-slate-600 rounded-xl px-4 py-6 text-center">
         <p class="text-sm text-gray-500 dark:text-slate-400">{{ $t('apiKey.noKey') }}</p>
@@ -63,7 +78,7 @@
         v-else
         @click="handleRegenerate"
         :disabled="regenerating"
-        :class="auth.apiKey
+        :class="hasOrFresh
           ? 'border-2 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
           : 'bg-emerald-500 hover:bg-emerald-400 text-white shadow-sm shadow-emerald-500/25'"
         class="w-full flex items-center justify-center gap-2.5 disabled:opacity-60 font-bold py-3 rounded-xl text-sm transition-colors"
@@ -72,10 +87,10 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
         </svg>
-        {{ regenerating ? $t('apiKey.generating') : (auth.apiKey ? $t('apiKey.regenerate') : $t('apiKey.generate')) }}
+        {{ regenerating ? $t('apiKey.generating') : (hasOrFresh ? $t('apiKey.regenerate') : $t('apiKey.generate')) }}
       </button>
 
-      <p v-if="auth.apiKey" class="text-xs text-gray-400 dark:text-slate-600 text-center">
+      <p v-if="hasOrFresh" class="text-xs text-gray-400 dark:text-slate-600 text-center">
         {{ $t('apiKey.regenerateWarning') }}
       </p>
     </div>
@@ -84,7 +99,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '../stores/auth';
 import { useToast } from '../composables/useToast';
@@ -92,6 +107,11 @@ import { useToast } from '../composables/useToast';
 const { t } = useI18n();
 const auth = useAuthStore();
 const toast = useToast();
+
+// A key exists either freshly generated (full key in store) or already stored (masked prefix).
+const hasOrFresh = computed(() => !!(auth.apiKey || auth.hasKey));
+// Masked form of the stored key, e.g. ak_live_2Umab4******** (full key is shown only once).
+const maskedKey = computed(() => `${auth.apiKeyPrefix || 'ak_live_'}********`);
 
 const loading = ref(true);
 const regenerating = ref(false);
@@ -107,7 +127,7 @@ const copyKey = async () => {
 };
 
 const handleRegenerate = async () => {
-  if (auth.apiKey) {
+  if (hasOrFresh.value) {
     if (!confirm(t('apiKey.regenerateConfirm'))) return;
   }
   regenerating.value = true;
