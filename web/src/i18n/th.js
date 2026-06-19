@@ -264,6 +264,7 @@ export default {
     infoNote: 'ใช้ API Key ยืนยันตัวตนโดยเพิ่ม header X-API-Key: <your-key> ในทุก request',
     yourKey: 'API Key ของคุณ',
     keepSecure: 'เก็บ Key ไว้เป็นความลับ อย่าแชร์ให้ผู้อื่น',
+    maskedNote: 'เพื่อความปลอดภัย Key เต็มจะแสดงเพียงครั้งเดียวตอนสร้าง กด Regenerate เพื่อออก Key ใหม่',
     noKey: 'คุณยังไม่มี API Key กด Generate เพื่อสร้าง',
     generating: 'กำลังสร้าง...',
     generate: 'สร้าง API Key',

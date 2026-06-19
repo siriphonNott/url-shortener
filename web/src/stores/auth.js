@@ -37,8 +37,10 @@ export const useAuthStore = defineStore('auth', {
       user,
       permissions,
       authReady: !!(user && permissions),
+      hasKey: false,
       apiKeyId: null,
       apiKey: null,
+      apiKeyPrefix: null,
       apiKeyStatus: null,
       apiKeyExpiresAt: null,
     };
@@ -74,15 +76,21 @@ export const useAuthStore = defineStore('auth', {
     },
     async fetchApiKey() {
       const { data } = await api.get('/auth/api-key');
+      // getApiKey returns { hasKey, keyId, keyPrefix, ... } — the full key is show-once
+      // (never returned here), so display the stored prefix masked. Clear any stale full key.
+      this.hasKey = !!data.hasKey;
       this.apiKeyId = data.keyId || null;
-      this.apiKey = data.apiKey || null;
+      this.apiKeyPrefix = data.keyPrefix || null;
       this.apiKeyStatus = data.apiKeyStatus || null;
       this.apiKeyExpiresAt = data.apiKeyExpiresAt || null;
+      this.apiKey = null;
     },
     async regenerateApiKey() {
       const { data } = await api.post('/auth/api-key/regenerate');
+      this.hasKey = true;
       this.apiKeyId = data.keyId;
-      this.apiKey = data.apiKey;
+      this.apiKey = data.apiKey; // full key — shown once, right after generation
+      this.apiKeyPrefix = data.keyPrefix;
       this.apiKeyStatus = data.apiKeyStatus;
       this.apiKeyExpiresAt = data.apiKeyExpiresAt;
     },
@@ -91,8 +99,10 @@ export const useAuthStore = defineStore('auth', {
       this.user = null;
       this.permissions = null;
       this.authReady = false;
+      this.hasKey = false;
       this.apiKeyId = null;
       this.apiKey = null;
+      this.apiKeyPrefix = null;
       this.apiKeyStatus = null;
       this.apiKeyExpiresAt = null;
       localStorage.removeItem('token');

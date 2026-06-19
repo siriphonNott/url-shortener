@@ -264,6 +264,7 @@ export default {
     infoNote: 'Use your API key to authenticate requests by adding the header X-API-Key: <your-key> to your requests.',
     yourKey: 'Your API Key',
     keepSecure: 'Keep this key secure and do not share it publicly.',
+    maskedNote: 'For security, the full key is shown only once at creation. Regenerate to issue a new key.',
     noKey: "You don't have an API key yet. Generate one below.",
     generating: 'Generating...',
     generate: 'Generate API Key',
