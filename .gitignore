@@ -17,6 +17,10 @@ api/.env.local
 web/.env
 web/.env.local
 
+# Wrangler local dev secrets
+.dev.vars
+api/.dev.vars
+
 # Logs
 logs/
 *.log

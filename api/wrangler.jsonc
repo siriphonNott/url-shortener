@@ -17,5 +17,7 @@
     { "pattern": "api.eraflow.dev", "custom_domain": true },
     { "pattern": "eraflow.dev", "custom_domain": true }
   ],
-  "vars": { "BASE_SHORT_URL": "https://eraflow.dev" }
+  "vars": { "BASE_SHORT_URL": "https://eraflow.dev" },
+  // Local `wrangler dev` only — pin to a fixed port so the web dev proxy (web/vite.config.js) is deterministic.
+  "dev": { "port": 8787 }
 }
