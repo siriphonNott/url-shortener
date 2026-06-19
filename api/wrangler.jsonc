@@ -1,0 +1,11 @@
+{
+  "name": "blly-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-09-23",
+  "observability": { "enabled": true },
+  "assets": { "directory": "./public", "binding": "ASSETS" },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "blly-db", "database_id": "PLACEHOLDER_SET_IN_TASK_2", "migrations_dir": "drizzle" }
+  ],
+  "vars": { "BASE_SHORT_URL": "http://localhost:8787" }
+}
