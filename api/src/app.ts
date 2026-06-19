@@ -5,6 +5,7 @@ import { authRoutes } from './routes/auth';
 import { linkRoutes } from './routes/links';
 import { userRoutes } from './routes/users';
 import { roleRoutes } from './routes/roles';
+import { apiKeyRoutes } from './routes/apiKeys';
 import { createLink } from './controllers/linkController';
 import { auth } from './middleware/auth';
 
@@ -17,6 +18,7 @@ app.route('/api/v1/auth', authRoutes);
 app.route('/api/v1/links', linkRoutes);
 app.route('/api/v1/users', userRoutes);
 app.route('/api/v1/roles', roleRoutes);
+app.route('/api/v1/api-keys', apiKeyRoutes);
 app.post('/api/v1/shorten', auth, createLink);
 
 export default app;

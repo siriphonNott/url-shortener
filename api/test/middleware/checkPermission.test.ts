@@ -4,15 +4,18 @@ import { Hono } from 'hono';
 import { checkPermission } from '../../src/middleware/checkPermission';
 import type { AppBindings } from '../../src/env';
 
+const userId = 'cptest_u1';
+const roleId = 'cptest_r1';
+
 const app = new Hono<AppBindings>();
-app.use('*', async (c, next) => { c.set('user', { id: 'u1' }); return next(); });
+app.use('*', async (c, next) => { c.set('user', { id: userId }); return next(); });
 app.get('/urls', checkPermission('urls', 'view'), (c) => c.json({ ok: true }));
 app.get('/secret', checkPermission('admin', 'view'), (c) => c.json({ ok: true }));
 
 beforeAll(async () => {
-  await env.DB.prepare("INSERT INTO roles (id,name,description,permissions,created_at,updated_at) VALUES ('r1','viewer','','{\"urls\":{\"view\":true}}','x','x')").run();
-  await env.DB.prepare("INSERT INTO users (id,email,password,full_name,account_type,status,created_at,updated_at) VALUES ('u1','p@b.co','h','','free','active','x','x')").run();
-  await env.DB.prepare("INSERT INTO user_roles (user_id,role_id) VALUES ('u1','r1')").run();
+  await env.DB.prepare("INSERT INTO roles (id,name,description,permissions,created_at,updated_at) VALUES (?,?,?,?,?,?)").bind(roleId,'viewer','',JSON.stringify({urls:{view:true}}),'x','x').run();
+  await env.DB.prepare("INSERT INTO users (id,email,password,full_name,account_type,status,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?)").bind(userId,'cptest_p@b.co','h','','free','active','x','x').run();
+  await env.DB.prepare("INSERT INTO user_roles (user_id,role_id) VALUES (?,?)").bind(userId,roleId).run();
 });
 
 describe('checkPermission', () => {
