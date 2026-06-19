@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import type { Env } from './env.d';
+import type { Env } from './env';
 import { getDb } from './db/client';
 import { users, roles, userRoles } from './db/schema';
 import { hashPassword } from './lib/password';
@@ -17,7 +17,8 @@ export async function seedAdmin(env: Env, opts: { email: string; password: strin
   const existing = await db.select().from(users).where(eq(users.email, email)).get();
   if (existing) {
     const r = await db.select().from(roles).where(eq(roles.name, 'admin')).get();
-    return { roleId: r!.id, userId: existing.id };
+    if (!r) throw new Error('seedAdmin: user exists but admin role is missing — DB is in an inconsistent state');
+    return { roleId: r.id, userId: existing.id };
   }
   const now = nowIso();
   let role = await db.select().from(roles).where(eq(roles.name, 'admin')).get();
