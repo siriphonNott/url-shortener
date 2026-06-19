@@ -3,9 +3,18 @@
   "main": "src/index.ts",
   "compatibility_date": "2024-09-23",
   "observability": { "enabled": true },
+  // Static Assets: serve ./public on the apex host. NO not_found_handling — the default
+  // returns 404 for unmatched paths, which index.ts treats as a short-code redirect.
+  // Do NOT set "single-page-application" here: it would 200 every path and shadow /:code.
   "assets": { "directory": "./public", "binding": "ASSETS" },
   "d1_databases": [
+    // database_id is a placeholder — replace with the real id from `wrangler d1 create blly-db` before any remote/deploy op.
     { "binding": "DB", "database_name": "blly-db", "database_id": "00000000-0000-0000-0000-000000000000", "migrations_dir": "drizzle" }
   ],
-  "vars": { "BASE_SHORT_URL": "http://localhost:8787" }
+  // Production hostname routes (set the zone before deploy). api.* → Hono API; apex → assets/redirect (see src/index.ts).
+  "routes": [
+    { "pattern": "api.blly.to/*", "zone_name": "blly.to" },
+    { "pattern": "blly.to/*", "zone_name": "blly.to" }
+  ],
+  "vars": { "BASE_SHORT_URL": "https://blly.to" }
 }

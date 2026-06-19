@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import type { AppBindings } from './env.ts';
+import type { AppBindings } from './env';
 import { authRoutes } from './routes/auth';
 import { linkRoutes } from './routes/links';
 import { userRoutes } from './routes/users';
