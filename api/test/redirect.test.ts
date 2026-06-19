@@ -24,10 +24,12 @@ describe('redirect', () => {
   });
   it('increments click_count and writes a log (via waitUntil)', async () => {
     await hit('/go');
+    // isolatedStorage:true rolls back to the beforeAll snapshot (click_count=0, no logs) per `it`,
+    // so exactly one hit must yield exactly one increment and one log — assert strict equality.
     const row = await env.DB.prepare("SELECT click_count FROM links WHERE id='rl1'").first<{ click_count: number }>();
-    expect(row!.click_count).toBeGreaterThanOrEqual(1);
+    expect(row!.click_count).toBe(1);
     const logs = await env.DB.prepare("SELECT COUNT(*) n FROM redirect_logs WHERE link_id='rl1'").first<{ n: number }>();
-    expect(logs!.n).toBeGreaterThanOrEqual(1);
+    expect(logs!.n).toBe(1);
   });
   it('expired link → LINK_EXPIRED', async () => {
     const res = await hit('/old');
