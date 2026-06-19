@@ -61,7 +61,7 @@ export const updateLink = async (c: C) => {
   if (code?.trim()) set.code = code.trim();
   const db = getDb(c.env);
   try {
-    const updated = await db.update(links).set(set).where(eq(links.id, c.req.param('id'))).returning().get();
+    const updated = await db.update(links).set(set).where(and(eq(links.id, c.req.param('id')), eq(links.createdBy, c.get('user').id))).returning().get();
     if (!updated) return fail(c, 'LINK_NOT_FOUND');
     return ok(c, { data: serializeLink(updated) });
   } catch (e) {
@@ -74,7 +74,7 @@ export const deleteLink = async (c: C) => {
   const ref = c.req.param('id');
   const db = getDb(c.env);
   const row = isUuid(ref)
-    ? await db.select().from(links).where(eq(links.id, ref)).get()
+    ? await db.select().from(links).where(and(eq(links.id, ref), eq(links.createdBy, c.get('user').id))).get()
     : await db.select().from(links).where(and(eq(links.code, ref), eq(links.createdBy, c.get('user').id))).get();
   if (!row) return fail(c, 'LINK_NOT_FOUND');
   await db.delete(links).where(eq(links.id, row.id)); // redirect_logs cascade via FK
