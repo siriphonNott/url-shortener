@@ -15,11 +15,11 @@ describe('schema', () => {
   it('enforces the account_type CHECK', async () => {
     await env.DB.prepare(
       "INSERT INTO users (id,email,password,full_name,account_type,status,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?)"
-    ).bind('schematest_u1', 'schematest_a@b.co', 'h', '', 'free', 'active', '2026-01-01T00:00:00Z', '2026-01-01T00:00:00Z').run();
+    ).bind('u1', 'a@b.co', 'h', '', 'free', 'active', '2026-01-01T00:00:00Z', '2026-01-01T00:00:00Z').run();
     await expect(
       env.DB.prepare(
         "INSERT INTO users (id,email,password,full_name,account_type,status,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?)"
-      ).bind('schematest_u2', 'schematest_c@d.co', 'h', '', 'WRONG', 'active', '2026-01-01T00:00:00Z', '2026-01-01T00:00:00Z').run()
+      ).bind('u2', 'c@d.co', 'h', '', 'WRONG', 'active', '2026-01-01T00:00:00Z', '2026-01-01T00:00:00Z').run()
     ).rejects.toThrow();
   });
 });

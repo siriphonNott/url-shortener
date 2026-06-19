@@ -7,6 +7,8 @@ let token: string;
 beforeAll(async () => {
   (env as any).JWT_SECRET = 'sec';
   await env.DB.prepare("INSERT INTO users (id,email,password,full_name,account_type,status,created_at,updated_at) VALUES ('ka','ka@x.co','h','K','free','active','x','x')").run();
+  // Seed one key so the list test has data under isolatedStorage:true (each `it` rolls back to this beforeAll snapshot; test #1's create does not persist into test #2).
+  await env.DB.prepare("INSERT INTO api_keys (id,user_id,key_name,key_hash,key_prefix,scopes,status,is_personal,created_at,updated_at) VALUES ('seedkey','ka','seed','seedhash','ak_live_seedpf','{\"links\":\"read\"}','active',0,'2026-06-10T00:00:00Z','2026-06-10T00:00:00Z')").run();
   token = await signToken('ka', 'sec');
 });
 const authH = () => ({ Authorization: `Bearer ${token}` });

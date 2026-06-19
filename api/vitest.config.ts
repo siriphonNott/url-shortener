@@ -10,7 +10,6 @@ export default defineWorkersConfig(async () => {
         workers: {
           wrangler: { configPath: './wrangler.jsonc' },
           singleWorker: true,
-          isolatedStorage: false,
           miniflare: {
             compatibilityDate: '2024-09-23',
             compatibilityFlags: ['nodejs_compat'],
