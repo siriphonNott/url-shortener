@@ -39,7 +39,7 @@ const assignDefaultRole = async (db: ReturnType<typeof getDb>, userId: string) =
     }
     role = await db.select().from(roles).where(eq(roles.name, DEFAULT_ROLE_NAME)).get();
   }
-  if (role) await db.insert(userRoles).values({ userId, roleId: role.id });
+  if (role) await db.insert(userRoles).values({ userId, roleId: role.id }).onConflictDoNothing();
 };
 
 export const register = async (c: C) => {
