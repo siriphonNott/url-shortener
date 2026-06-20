@@ -5,6 +5,17 @@ All notable changes to this project are documented here. Format based on
 [Semantic Versioning](https://semver.org/). The version tracks the **root `package.json`**
 as the single project version — `api/` and `web/` `package.json` versions are independent build versions.
 
+## [1.2.0] - 2026-06-21
+
+### Added
+- **Landing navbar Sign in + Sign up buttons** (`web/src/views/LandingView.vue`): the navbar now shows a secondary
+  "Sign in" link (→ `/login`) and a prominent gradient "Sign up" button on the right (→ `/signup`), replacing the
+  single "Login" button.
+
+### Changed
+- All "Get Started Free" CTAs route to **Sign up** (`/signup`). The bottom CTA button previously linked to `/login`;
+  the hero CTA already pointed to signup.
+
 ## [1.1.0] - 2026-06-21
 
 ### Added

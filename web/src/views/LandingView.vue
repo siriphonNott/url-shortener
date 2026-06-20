@@ -17,14 +17,22 @@
         </div>
         <span class="text-lg font-bold text-gray-900 dark:text-white tracking-tight">Blly.to</span>
       </div>
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 sm:gap-3">
         <LanguageSwitcher />
         <ThemeToggle />
+        <!-- Sign in — secondary, less prominent -->
         <a
           :href="loginUrl"
+          class="text-sm font-semibold text-gray-600 dark:text-slate-300 px-3 sm:px-4 py-2.5 rounded-2xl hover:bg-gray-100 dark:hover:bg-slate-800 transition-all duration-200"
+        >
+          {{ $t('auth.signInLink') }}
+        </a>
+        <!-- Sign up — primary, on the right, most prominent -->
+        <a
+          :href="signupUrl"
           class="shine-btn relative overflow-hidden flex items-center gap-2 bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white text-sm font-bold px-5 py-2.5 rounded-2xl shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-200 hover:-translate-y-px"
         >
-          {{ $t('auth.login') }}
+          {{ $t('auth.signUpLink') }}
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
           </svg>
@@ -283,7 +291,7 @@
               {{ $t('landing.ctaSub') }}
             </p>
             <a
-              :href="loginUrl"
+              :href="signupUrl"
               class="inline-flex items-center gap-2 bg-white text-blue-600 font-extrabold px-8 py-4 rounded-2xl hover:bg-blue-50 transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 text-base"
             >
               {{ $t('landing.ctaBtn') }}
