@@ -4,6 +4,7 @@ import type { AppBindings } from '../env';
 import { getDb } from '../db/client';
 import { users, roles, userRoles, apiKeys } from '../db/schema';
 import { ok, fail } from '../lib/errorCodes';
+import { verifyTurnstile } from '../lib/turnstile';
 import { hashPassword, verifyPassword } from '../lib/password';
 import { signToken } from '../lib/jwt';
 import { generateKey } from '../lib/keys';
@@ -14,8 +15,11 @@ type C = Context<AppBindings>;
 const uuid = () => crypto.randomUUID();
 
 export const register = async (c: C) => {
-  const { email, password } = (await c.req.json().catch(() => ({}))) ?? {};
+  const { email, password, turnstileToken } = (await c.req.json().catch(() => ({}))) ?? {};
   if (!email || !password) return fail(c, 'AUTH_MISSING_FIELDS');
+  if (String(password).length < 6) return fail(c, 'AUTH_WEAK_PASSWORD');
+  const ip = c.req.header('CF-Connecting-IP') ?? undefined;
+  if (!(await verifyTurnstile(turnstileToken, c.env.TURNSTILE_SECRET_KEY, ip))) return fail(c, 'AUTH_TURNSTILE_FAILED');
   const db = getDb(c.env);
   const id = uuid(); const now = nowIso();
   try {
