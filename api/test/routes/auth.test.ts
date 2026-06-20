@@ -149,4 +149,10 @@ describe('auth google', () => {
     expect(res.status).toBe(401);
     expect((await res.json() as any).errorCode).toBe('AUTH_GOOGLE_INVALID');
   });
+  it('google-only account cannot password-login → AUTH_INVALID_CREDENTIALS', async () => {
+    const tok = await signGoogle({ sub: 'pwonly-sub', email: 'pwonly@gmail.com', email_verified: true, name: 'PwOnly' });
+    await app.request('/api/v1/auth/google', json({ idToken: tok }), env);
+    const res = await app.request('/api/v1/auth/login', json({ email: 'pwonly@gmail.com', password: 'anything' }), env);
+    expect((await res.json() as any).errorCode).toBe('AUTH_INVALID_CREDENTIALS');
+  });
 });

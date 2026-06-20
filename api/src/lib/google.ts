@@ -12,6 +12,7 @@ const getJwks = () => (jwks ??= createRemoteJWKSet(new URL(GOOGLE_CERTS)));
 // Verify a Google Identity Services ID token. Throws on any failure (bad signature,
 // wrong issuer/audience, expired, missing/unverified email). Caller maps to AUTH_GOOGLE_INVALID.
 export async function verifyGoogleIdToken(idToken: string, clientId: string): Promise<GoogleClaims> {
+  if (!clientId) throw new Error('GOOGLE_CLIENT_ID not configured');
   const { payload } = await jwtVerify(idToken, getJwks(), { issuer: ISSUERS, audience: clientId });
   const sub = payload.sub as string | undefined;
   const email = (payload.email as string | undefined)?.toLowerCase();

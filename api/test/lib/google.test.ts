@@ -48,4 +48,8 @@ describe('verifyGoogleIdToken', () => {
   it('throws on a malformed token', async () => {
     await expect(verifyGoogleIdToken('not-a-jwt', CLIENT_ID)).rejects.toThrow();
   });
+  it('throws when clientId is empty (fail closed — audience check must not be skipped)', async () => {
+    const tok = await sign({ sub: 'g-5', email: 'c@gmail.com', email_verified: true });
+    await expect(verifyGoogleIdToken(tok, '')).rejects.toThrow('GOOGLE_CLIENT_ID not configured');
+  });
 });
