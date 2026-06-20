@@ -5,6 +5,22 @@ All notable changes to this project are documented here. Format based on
 [Semantic Versioning](https://semver.org/). The version tracks the **root `package.json`**
 as the single project version — `api/` and `web/` `package.json` versions are independent build versions.
 
+## [1.3.3] - 2026-06-21
+
+### Added
+- **CI now applies D1 migrations to remote on deploy** (`.github/workflows/deploy.yml`): a new
+  "Apply D1 migrations (remote)" step runs `wrangler d1 migrations apply blly-db --remote` in the
+  deploy job, before the web/API deploys, so schema changes ship automatically with the code that
+  needs them (expand-then-deploy; a migration failure aborts the deploy before anything ships).
+  Applies only pending migrations (tracked in `d1_migrations`); already-applied ones are skipped.
+
+### Fixed
+- **Google sign-in returned 500 in production.** Migration `0001` (adding `users.google_sub`) had
+  been committed but never applied to remote D1 — CI deployed code but never ran migrations — so
+  `googleSignin` queried a non-existent column and `app.onError` mapped the error to `SERVER_ERROR`
+  (HTTP 500). Fixed by applying `0001` to remote D1 (immediate hotfix); the new CI step above keeps
+  this gap from recurring.
+
 ## [1.3.2] - 2026-06-21
 
 ### Added
