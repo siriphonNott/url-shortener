@@ -52,8 +52,14 @@ export const useAuthStore = defineStore('auth', {
       this.user = data.user;
       localStorage.setItem('token', data.token);
     },
-    async register(email, password) {
-      const { data } = await api.post('/auth/register', { email, password });
+    async register(email, password, turnstileToken) {
+      const { data } = await api.post('/auth/register', { email, password, turnstileToken });
+      this.token = data.token;
+      this.user = data.user;
+      localStorage.setItem('token', data.token);
+    },
+    async googleSignin(idToken) {
+      const { data } = await api.post('/auth/google', { idToken });
       this.token = data.token;
       this.user = data.user;
       localStorage.setItem('token', data.token);
