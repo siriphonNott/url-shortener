@@ -11,6 +11,8 @@ export default {
     management: 'จัดการระบบ',
     account: 'บัญชีของฉัน',
     logout: 'ออกจากระบบ',
+    collapseSidebar: 'ย่อแถบเมนู',
+    expandSidebar: 'ขยายแถบเมนู',
   },
   common: {
     cancel: 'ยกเลิก',

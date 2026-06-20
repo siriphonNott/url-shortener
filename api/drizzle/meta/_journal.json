@@ -8,6 +8,13 @@
       "when": 1781877767311,
       "tag": "0000_rare_mister_sinister",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1781958868007,
+      "tag": "0001_elite_baron_strucker",
+      "breakpoints": true
     }
   ]
 }

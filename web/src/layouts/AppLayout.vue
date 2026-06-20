@@ -21,19 +21,40 @@
         'fixed inset-y-0 left-0 z-50 w-64 flex flex-col',
         'bg-white dark:bg-slate-900',
         'border-r border-gray-200 dark:border-slate-700',
-        'transition-transform duration-300 ease-in-out lg:static lg:translate-x-0',
+        'transition-[width,transform] duration-300 ease-in-out lg:relative lg:translate-x-0',
         ui.sidebarOpen ? 'translate-x-0 shadow-2xl shadow-black/10' : '-translate-x-full',
+        ui.sidebarCollapsed ? 'lg:w-[76px]' : 'lg:w-64',
       ]"
     >
+      <!-- Collapse toggle (desktop only) -->
+      <button
+        type="button"
+        @click="ui.toggleSidebarCollapsed()"
+        :aria-label="ui.sidebarCollapsed ? $t('nav.expandSidebar') : $t('nav.collapseSidebar')"
+        :aria-expanded="!ui.sidebarCollapsed"
+        class="hidden lg:flex absolute -right-3 top-7 z-50 h-6 w-6 items-center justify-center rounded-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-500 dark:text-slate-400 shadow-md shadow-black/5 hover:text-blue-500 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-500/40 hover:scale-105 transition-all duration-200"
+      >
+        <svg
+          class="w-3.5 h-3.5 transition-transform duration-300"
+          :class="ui.sidebarCollapsed ? 'rotate-180' : ''"
+          fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
       <!-- Logo -->
-      <div class="flex items-center gap-3 px-5 pt-6 pb-5 shrink-0">
+      <div class="flex items-center gap-3 px-5 pt-6 pb-5 shrink-0 overflow-hidden">
         <div class="w-9 h-9 bg-gradient-to-br from-blue-500 to-violet-600 rounded-xl flex items-center justify-center shadow-md shadow-blue-500/25 shrink-0">
           <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
           </svg>
         </div>
-        <div class="min-w-0">
+        <div
+          class="min-w-0 whitespace-nowrap transition-opacity duration-200"
+          :class="ui.sidebarCollapsed ? 'lg:opacity-0' : ''"
+        >
           <p class="text-[15px] font-bold text-gray-900 dark:text-white tracking-tight leading-none">Blly.to</p>
           <p class="text-[11px] text-gray-500 dark:text-slate-400 mt-1 leading-none">Short Link Manager</p>
         </div>
@@ -63,8 +84,16 @@
             <template v-for="item in visibleNavItems">
 
               <!-- Section label -->
-              <div v-if="item.section" :key="'s-' + item.section" class="px-3 pt-4 pb-1.5">
-                <p class="text-[10px] font-bold text-gray-500 dark:text-slate-500 uppercase tracking-[0.1em]">{{ $t(item.section) }}</p>
+              <div v-if="item.section" :key="'s-' + item.section" class="pt-4 pb-1.5">
+                <p
+                  class="px-3 text-[10px] font-bold text-gray-500 dark:text-slate-500 uppercase tracking-[0.1em]"
+                  :class="ui.sidebarCollapsed ? 'lg:hidden' : ''"
+                >{{ $t(item.section) }}</p>
+                <!-- Collapsed: thin divider keeps the grouping -->
+                <div
+                  class="mx-3 h-px bg-gray-200 dark:bg-slate-700"
+                  :class="ui.sidebarCollapsed ? 'hidden lg:block' : 'hidden'"
+                />
               </div>
 
               <!-- Nav link -->
@@ -72,11 +101,18 @@
                 v-else
                 :key="item.path"
                 :to="item.path"
-                @click="ui.sidebarOpen = false"
+                :aria-label="$t(item.labelKey)"
+                @click="onNavClick"
+                @mouseenter="showTip($event, $t(item.labelKey))"
+                @mouseleave="hideTip"
+                @focus="showTip($event, $t(item.labelKey))"
+                @blur="hideTip"
                 class="group relative flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm transition-all duration-200 overflow-hidden"
-                :class="$route.path === item.path
-                  ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-semibold'
-                  : 'text-gray-700 dark:text-slate-300 font-medium hover:bg-gray-50 dark:hover:bg-slate-800/80 hover:text-gray-900 dark:hover:text-white'"
+                :class="
+                  $route.path === item.path
+                    ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-semibold'
+                    : 'text-gray-700 dark:text-slate-300 font-medium hover:bg-gray-50 dark:hover:bg-slate-800/80 hover:text-gray-900 dark:hover:text-white'
+                "
               >
                 <!-- Active left bar -->
                 <Transition
@@ -106,13 +142,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="item.iconD" />
                 </svg>
 
-                <span class="truncate">{{ $t(item.labelKey) }}</span>
-
-                <!-- Active dot accent -->
-                <span
-                  v-if="$route.path === item.path"
-                  class="ml-auto w-1.5 h-1.5 rounded-full bg-blue-400 dark:bg-blue-500 shrink-0"
-                />
+                <span class="truncate transition-opacity duration-200" :class="ui.sidebarCollapsed ? 'lg:opacity-0' : ''">{{ $t(item.labelKey) }}</span>
               </router-link>
             </template>
           </div>
@@ -125,18 +155,24 @@
       <!-- User info footer -->
       <div class="px-3 py-3 shrink-0">
         <button
-          class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-800/80 transition-all duration-200 group"
+          class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl overflow-hidden hover:bg-gray-50 dark:hover:bg-slate-800/80 transition-all duration-200 group"
+          :aria-label="displayName"
           @click="goProfile"
+          @mouseenter="showTip($event, displayName)"
+          @mouseleave="hideTip"
+          @focus="showTip($event, displayName)"
+          @blur="hideTip"
         >
           <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shrink-0 text-white text-xs font-bold uppercase shadow-sm">
             {{ displayName.charAt(0) }}
           </div>
-          <div class="flex-1 min-w-0 text-left">
+          <div class="flex-1 min-w-0 text-left whitespace-nowrap transition-opacity duration-200" :class="ui.sidebarCollapsed ? 'lg:opacity-0' : ''">
             <p class="text-sm font-semibold text-gray-800 dark:text-slate-200 truncate leading-tight">{{ displayName }}</p>
             <p class="text-[11px] text-gray-500 dark:text-slate-400 truncate mt-0.5">{{ auth.user?.email }}</p>
           </div>
           <svg
             class="w-4 h-4 text-gray-400 dark:text-slate-500 group-hover:text-gray-500 dark:group-hover:text-slate-400 group-hover:translate-x-0.5 shrink-0 transition-all duration-200"
+            :class="ui.sidebarCollapsed ? 'lg:hidden' : ''"
             fill="none" stroke="currentColor" viewBox="0 0 24 24"
           >
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -206,11 +242,35 @@
       @confirm="handleLogout"
       @cancel="ui.showLogoutConfirm = false"
     />
+
+    <!-- Collapsed-sidebar tooltip (rendered to body to escape nav overflow) -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition duration-150 ease-out"
+        enter-from-class="opacity-0 -translate-x-1"
+        enter-to-class="opacity-100 translate-x-0"
+        leave-active-class="transition duration-100 ease-in"
+        leave-from-class="opacity-100 translate-x-0"
+        leave-to-class="opacity-0 -translate-x-1"
+      >
+        <div
+          v-if="tooltip.show"
+          class="fixed z-[100] -translate-y-1/2 pointer-events-none"
+          :style="{ top: tooltip.top + 'px', left: tooltip.left + 'px' }"
+          role="tooltip"
+        >
+          <div class="relative px-2.5 py-1.5 rounded-lg bg-slate-900 dark:bg-slate-700 text-white text-xs font-medium whitespace-nowrap shadow-lg shadow-black/25 ring-1 ring-white/10">
+            {{ tooltip.text }}
+            <span class="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-slate-900 dark:border-r-slate-700" />
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '../stores/auth';
@@ -232,6 +292,40 @@ const ui = useUIStore();
 const store = useLinksStore();
 const { init: initTheme } = useTheme();
 const { can } = usePermission();
+
+// --- Collapsed-sidebar tooltip ---------------------------------------------
+// Only shown on desktop (lg+) while the sidebar is collapsed to an icon rail.
+const isLg = ref(false);
+let lgQuery = null;
+
+const tooltip = ref({ show: false, text: '', top: 0, left: 0 });
+
+const showTip = (event, text) => {
+  if (!ui.sidebarCollapsed || !isLg.value) return;
+  const rect = event.currentTarget.getBoundingClientRect();
+  tooltip.value = {
+    show: true,
+    text,
+    top: rect.top + rect.height / 2,
+    left: rect.right + 12,
+  };
+};
+const hideTip = () => { tooltip.value.show = false; };
+
+// The tooltip position is snapshotted on show, so dismiss it whenever the
+// anchor could move or the rail could disappear: scroll (capture phase also
+// catches the nav's own scroll), resize, Escape, breakpoint drop, and toggle.
+const onLgChange = (e) => {
+  isLg.value = e.matches;
+  if (!e.matches) hideTip();
+};
+const onKeydown = (e) => { if (e.key === 'Escape') hideTip(); };
+watch(() => ui.sidebarCollapsed, hideTip);
+
+const onNavClick = () => {
+  ui.sidebarOpen = false;
+  hideTip();
+};
 
 const navItems = [
   { path: '/dashboard', labelKey: 'nav.dashboard', permission: 'dashboard', iconD: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
@@ -285,6 +379,12 @@ const ROUTE_PERMISSION = {
 
 onMounted(async () => {
   initTheme();
+  lgQuery = window.matchMedia('(min-width: 1024px)');
+  isLg.value = lgQuery.matches;
+  lgQuery.addEventListener('change', onLgChange);
+  window.addEventListener('scroll', hideTip, true);
+  window.addEventListener('resize', hideTip);
+  window.addEventListener('keydown', onKeydown);
   if (auth.token && !auth.user) {
     await auth.fetchMe();
   } else if (!auth.token) {
@@ -296,6 +396,13 @@ onMounted(async () => {
     const first = navItems.find((n) => can(n.permission));
     router.replace(first ? first.path : '/login');
   }
+});
+
+onBeforeUnmount(() => {
+  lgQuery?.removeEventListener('change', onLgChange);
+  window.removeEventListener('scroll', hideTip, true);
+  window.removeEventListener('resize', hideTip);
+  window.removeEventListener('keydown', onKeydown);
 });
 
 const handleCreateLink = () => {
