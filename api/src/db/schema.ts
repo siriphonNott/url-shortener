@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, primaryKey, index, check } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, primaryKey, index, uniqueIndex, check } from 'drizzle-orm/sqlite-core';
 import { sql } from 'drizzle-orm';
 
 export const users = sqliteTable('users', {
@@ -8,12 +8,14 @@ export const users = sqliteTable('users', {
   fullName: text('full_name').notNull().default(''),
   accountType: text('account_type').notNull().default('free'),
   status: text('status').notNull().default('active'),
+  googleSub: text('google_sub'),
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
 // NOTE: migration drizzle/0000_*.sql already contains these inline and is authoritative for the existing DB; this aligns the Drizzle source so future drizzle-kit generate agrees.
 }, (t) => ({
   accountTypeCheck: check('users_account_type_check', sql`${t.accountType} in ('free','premium','enterprise')`),
   statusCheck: check('users_status_check', sql`${t.status} in ('active','inactive','suspended','pending_verification')`),
+  googleSubIdx: uniqueIndex('idx_users_google_sub').on(t.googleSub),
 }));
 
 export const roles = sqliteTable('roles', {
