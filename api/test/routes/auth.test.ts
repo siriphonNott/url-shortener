@@ -127,6 +127,7 @@ describe('auth google', () => {
     const res = await app.request('/api/v1/auth/google', json({ idToken: tok }), env);
     expect(res.status).toBe(201);
     const b = await res.json() as any;
+    expect(b.success).toBe(true);
     expect(b.token).toBeTruthy();
     expect(b.user.email).toBe('fresh@gmail.com');
     const row = await env.DB.prepare("SELECT google_sub, password FROM users WHERE email='fresh@gmail.com'").first() as any;
@@ -138,6 +139,7 @@ describe('auth google', () => {
     const res = await app.request('/api/v1/auth/google', json({ idToken: tok }), env);
     expect(res.status).toBe(200);
     const b = await res.json() as any;
+    expect(b.success).toBe(true);
     expect(b.user.id).toBe('seed-link');
     const row = await env.DB.prepare("SELECT google_sub FROM users WHERE id='seed-link'").first() as any;
     expect(row.google_sub).toBe('link-sub');

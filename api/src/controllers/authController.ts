@@ -127,10 +127,11 @@ export const googleSignin = async (c: C) => {
     created = true;
   }
 
-  if (u!.status === 'inactive') return fail(c, 'AUTH_ACCOUNT_INACTIVE');
-  if (u!.status === 'suspended') return fail(c, 'AUTH_ACCOUNT_SUSPENDED');
-  if (u!.status === 'pending_verification') return fail(c, 'AUTH_ACCOUNT_PENDING');
+  if (!u) return fail(c, 'SERVER_ERROR');
+  if (u.status === 'inactive') return fail(c, 'AUTH_ACCOUNT_INACTIVE');
+  if (u.status === 'suspended') return fail(c, 'AUTH_ACCOUNT_SUSPENDED');
+  if (u.status === 'pending_verification') return fail(c, 'AUTH_ACCOUNT_PENDING');
 
-  const token = await signToken(u!.id, c.env.JWT_SECRET);
+  const token = await signToken(u.id, c.env.JWT_SECRET);
   return ok(c, { token, user: userPayload(u) }, created ? 201 : 200);
 };
