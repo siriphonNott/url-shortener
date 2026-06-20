@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "test": "vitest run",
-    "test:watch": "vitest",
+    "test": "mkdir -p public && vitest run",
+    "test:watch": "mkdir -p public && vitest",
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply blly-db --local",
     "db:migrate:remote": "wrangler d1 migrations apply blly-db --remote"

@@ -5,6 +5,17 @@ All notable changes to this project are documented here. Format based on
 [Semantic Versioning](https://semver.org/). The version tracks the **root `package.json`**
 as the single project version — `api/` and `web/` `package.json` versions are independent build versions.
 
+## [1.3.5] - 2026-06-21
+
+### Fixed
+- **CI test job failed at vitest startup: "assets.directory ... does not exist: api/public".** The api
+  test suite runs `@cloudflare/vitest-pool-workers`, which loads `api/wrangler.jsonc` and requires its
+  `assets.directory` (`./public`) to exist — but `api/public` is gitignored (a generated copy of
+  `web/dist`, created only during deploy), so it's absent in a fresh checkout. Tests passed locally only
+  because the dir happened to exist. Fixed by making the precondition explicit in the api `test` /
+  `test:watch` scripts: `mkdir -p public && vitest …` (idempotent), so `npm test` is self-contained in
+  CI and on any fresh clone. This had blocked the whole deploy pipeline (incl. the new D1-migration step).
+
 ## [1.3.4] - 2026-06-21
 
 ### Fixed
