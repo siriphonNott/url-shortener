@@ -7,8 +7,14 @@ Currently **live on the `eraflow.dev` zone** (blly.to is the eventual brand but 
 ## Current state (resume here)
 
 - **Trunk is `main`.** The migration (PR #1, `migrate-to-cloudflare-d1`) is **merged** and **deployed from `main`**.
-  Start new work on a fresh branch off `main`. (Direct push to `main` is harness-blocked — see Gotchas; land changes
-  via a branch + `gh pr merge` as `siriphonNott`.)
+- **Working flow (always):** start EVERY piece of implementation work in a **git worktree** — never edit in the
+  main checkout (use the `superpowers:using-git-worktrees` skill / `EnterWorktree`). Pure questions/reads need no worktree.
+- **No PRs.** Land finished work by merging the branch into `main` locally; direct push to `main` is harness-blocked
+  (see Gotchas), so the **user pushes** `main`. On push to `main`, **GitHub Actions auto-deploys** api + web (see CI/CD).
+- **Changelog + version (every landed change):** BEFORE handing work off for `main`, add a summary entry to
+  `CHANGELOG.md` and bump the **root `package.json`** version. Semver by change type: `patch` = fix/chore/docs,
+  `minor` = new feature, `major` = breaking. The version anchors to root `package.json`; `api/`+`web/` versions stay
+  independent. CHANGELOG follows Keep a Changelog (newest entry on top, `## [x.y.z] - YYYY-MM-DD`).
 - **Backend:** complete, **70/70 tests passing**.
 - **Deployed (Cloudflare account `siriphonnot@gmail.com`):**
   - `https://api.eraflow.dev` — API (Worker `blly-api`)
@@ -96,9 +102,16 @@ Local D1 is fully local (Miniflare) — migrate with `npm run db:migrate:local`.
 
 ## Deployment (eraflow.dev)
 
-Requires a CF API token with **Account: D1 Edit + Workers Scripts Edit + Account Settings Read; Zone(eraflow.dev):
-Workers Routes Edit + DNS Edit + Zone Read** (the "Edit Cloudflare Workers" template + D1 + DNS). Pass via
-`CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` env (never commit it). Full procedure: see the cutover runbook.
+**CI/CD (primary):** `.github/workflows/deploy.yml` runs on **push to `main`** — runs the api test suite, then (on
+green) builds web → deploys the SPA (`app.eraflow.dev`) → refreshes the apex landing in `api/public` → deploys the api
+Worker (`api.eraflow.dev` + `eraflow.dev`). Needs GitHub repo secrets `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID`.
+The Worker also needs **runtime secrets set once** via `wrangler secret put` (CI does NOT set these): `JWT_SECRET` (set),
+plus `TURNSTILE_SECRET_KEY` and `GOOGLE_CLIENT_ID` — the latter two back signup/Google sign-in server-side; if missing in
+prod those endpoints fail even though the frontend has the public `VITE_*` keys.
+
+**Manual deploy (fallback)** requires a CF API token with **Account: D1 Edit + Workers Scripts Edit + Account Settings
+Read; Zone(eraflow.dev): Workers Routes Edit + DNS Edit + Zone Read** (the "Edit Cloudflare Workers" template + D1 +
+DNS). Pass via `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` env (never commit it). Full procedure: see the cutover runbook.
 
 - **Backend:** `cd api && npm run deploy` (D1 already created: `blly-db`, id in `wrangler.jsonc`; secret `JWT_SECRET` set remotely).
 - **Frontend — rebuild and deploy BOTH or the apex landing goes stale:**
@@ -122,10 +135,11 @@ Workers Routes Edit + DNS Edit + Zone Read** (the "Edit Cloudflare Workers" temp
 
 ## Gotchas
 
-- **Pushing:** direct push to `main` is harness-blocked — work on the branch and let the user push. SSH auths as
-  `siriphonNott` via `~/.ssh/me` (needs `IdentitiesOnly yes` for github.com).
-- **`gh` CLI:** the active account defaults to `developerf03` (not a collaborator → `gh pr` fails). Switch first:
-  `gh auth switch --hostname github.com --user siriphonNott`, then switch back when done.
+- **Pushing:** direct push to `main` is harness-blocked — work in a worktree branch, merge into `main` locally, and let
+  the **user push** `main` (which triggers the CI deploy). SSH auths as `siriphonNott` via `~/.ssh/me` (needs
+  `IdentitiesOnly yes` for github.com). **No PRs** — see Working flow in Current state.
+- **`gh` CLI:** the active account defaults to `developerf03`; switch with `gh auth switch --hostname github.com --user
+  siriphonNott` if you need `gh` (e.g. setting repo secrets), then switch back.
 - **Local DNS cache:** a sandbox may fail to resolve `*.eraflow.dev` (stale NXDOMAIN) right after deploy; test with
   `curl --resolve host:443:104.21.67.192 ...`. Public DNS (and real browsers) resolve fine.
 - `database_id` in `wrangler.jsonc` is the real `blly-db` id; if cloning to a new account, recreate D1 and replace it.
