@@ -17,11 +17,11 @@
 
       <span
         class="flex-1 truncate"
-        :class="selectedOption ? 'text-gray-800 dark:text-slate-200 font-medium' : 'text-gray-400 dark:text-slate-500'"
+        :class="selectedOption ? 'text-gray-800 dark:text-slate-200 font-medium' : 'text-gray-500 dark:text-slate-400'"
       >{{ selectedOption?.label ?? placeholder }}</span>
 
       <svg
-        class="w-4 h-4 text-gray-400 dark:text-slate-500 shrink-0 transition-transform duration-200"
+        class="w-4 h-4 text-gray-500 dark:text-slate-400 shrink-0 transition-transform duration-200"
         :class="open ? 'rotate-180' : ''"
         fill="none" stroke="currentColor" viewBox="0 0 24 24"
       >
@@ -45,9 +45,9 @@
           :style="dropdownStyle"
         >
           <!-- Search (only when searchable) -->
-          <div v-if="searchable" class="p-2 border-b border-gray-100 dark:border-slate-700">
+          <div v-if="searchable" class="p-2 border-b border-gray-200 dark:border-slate-700">
             <div class="relative">
-              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-slate-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 dark:text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <input
@@ -55,7 +55,7 @@
                 v-model="query"
                 type="text"
                 :placeholder="searchPlaceholder || 'Search...'"
-                class="w-full pl-8 pr-3 py-2 text-sm bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-800 dark:text-slate-200 placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                class="w-full pl-8 pr-3 py-2 text-sm bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-800 dark:text-slate-200 placeholder-gray-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
               />
             </div>
           </div>
@@ -78,7 +78,7 @@
                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
               </svg>
             </button>
-            <p v-if="searchable && query && !filteredOptions.length" class="text-xs text-center text-gray-400 dark:text-slate-500 py-3">No results</p>
+            <p v-if="searchable && query && !filteredOptions.length" class="text-xs text-center text-gray-500 dark:text-slate-400 py-3">No results</p>
           </div>
         </div>
       </Transition>

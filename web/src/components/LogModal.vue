@@ -16,7 +16,7 @@
           </div>
           <div>
             <h2 class="text-base font-bold text-gray-900 dark:text-slate-100">{{ $t('logModal.title') }}</h2>
-            <p class="text-xs text-gray-400 dark:text-slate-500 font-mono mt-0.5">{{ baseShortUrl }}/{{ link.code }}</p>
+            <p class="text-xs text-gray-500 dark:text-slate-400 font-mono mt-0.5">{{ baseShortUrl }}/{{ link.code }}</p>
           </div>
         </div>
         <button
@@ -32,7 +32,7 @@
       <!-- Content -->
       <div class="overflow-auto flex-1">
         <!-- Loading -->
-        <div v-if="loading" class="p-16 flex flex-col items-center gap-3 text-gray-500 dark:text-slate-500">
+        <div v-if="loading" class="p-16 flex flex-col items-center gap-3 text-gray-600 dark:text-slate-400">
           <svg class="animate-spin w-7 h-7 text-indigo-500" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
@@ -43,17 +43,17 @@
         <!-- Empty -->
         <div v-else-if="logs.length === 0" class="p-16 flex flex-col items-center gap-3 animate-fade-in">
           <div class="w-14 h-14 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl flex items-center justify-center">
-            <svg class="w-7 h-7 text-indigo-400 dark:text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-7 h-7 text-indigo-500 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                 d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0" />
             </svg>
           </div>
           <p class="text-gray-800 dark:text-slate-200 font-bold">{{ $t('logModal.noLogs') }}</p>
-          <p class="text-sm text-gray-500 dark:text-slate-500">{{ $t('logModal.noLogsHint') }}</p>
+          <p class="text-sm text-gray-600 dark:text-slate-400">{{ $t('logModal.noLogsHint') }}</p>
         </div>
 
         <!-- Log list -->
-        <div v-else class="divide-y divide-gray-100 dark:divide-slate-800">
+        <div v-else class="divide-y divide-gray-200 dark:divide-slate-700/70">
           <div
             v-for="(log, index) in pagedLogs"
             :key="log._id"
@@ -78,7 +78,7 @@
                 </span>
               </div>
               <!-- User Agent -->
-              <p class="text-xs text-gray-500 dark:text-slate-500 truncate" :title="log.userAgent">
+              <p class="text-xs text-gray-600 dark:text-slate-400 truncate" :title="log.userAgent">
                 {{ log.userAgent || '—' }}
               </p>
               <!-- Referer -->
@@ -95,13 +95,13 @@
         v-if="!loading && logs.length > 0"
         class="flex items-center justify-between px-6 py-3.5 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/40 shrink-0 rounded-b-2xl"
       >
-        <p class="text-sm text-gray-500 dark:text-slate-500">
+        <p class="text-sm text-gray-600 dark:text-slate-400">
           {{ $t('logModal.showingLatest', { n: logs.length }) }}
         </p>
 
         <!-- Pagination -->
         <div class="flex items-center gap-2">
-          <span class="text-xs text-gray-400 dark:text-slate-600">
+          <span class="text-xs text-gray-500 dark:text-slate-500">
             {{ (currentPage - 1) * PAGE_SIZE + 1 }}–{{ Math.min(currentPage * PAGE_SIZE, logs.length) }} / {{ logs.length }}
           </span>
           <button

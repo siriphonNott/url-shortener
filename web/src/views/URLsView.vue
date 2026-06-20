@@ -19,10 +19,10 @@
     <div class="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700/60 shadow-sm overflow-hidden">
 
       <!-- Search + Filter -->
-      <div class="p-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between gap-3">
+      <div class="p-4 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between gap-3">
         <!-- Search -->
         <div class="relative flex-1 max-w-sm">
-          <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-slate-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" />
           </svg>
           <input
@@ -76,12 +76,12 @@
         <!-- Data table -->
         <table v-else class="w-full text-sm">
           <thead>
-            <tr class="border-b border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50">
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wide whitespace-nowrap">{{ $t('urls.titleCol') }}</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wide whitespace-nowrap">{{ $t('urls.shortLinkCol') }}</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wide whitespace-nowrap">{{ $t('urls.destinationUrlCol') }}</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wide whitespace-nowrap">{{ $t('urls.visitsCol') }}</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wide whitespace-nowrap">{{ $t('common.status') }}</th>
+            <tr class="border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap">{{ $t('urls.titleCol') }}</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap">{{ $t('urls.shortLinkCol') }}</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap">{{ $t('urls.destinationUrlCol') }}</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap">{{ $t('urls.visitsCol') }}</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap">{{ $t('common.status') }}</th>
               <th
                 class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap cursor-pointer select-none"
                 @click="toggleSort"
@@ -93,11 +93,11 @@
                   </svg>
                 </span>
               </th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wide whitespace-nowrap">{{ $t('urls.expiredAtCol') }}</th>
-              <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wide whitespace-nowrap">{{ $t('common.actions') }}</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap">{{ $t('urls.expiredAtCol') }}</th>
+              <th class="px-4 py-3 text-right text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap">{{ $t('common.actions') }}</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-50 dark:divide-slate-800">
+          <tbody class="divide-y divide-gray-200 dark:divide-slate-700/70">
             <tr
               v-for="link in pagedLinks"
               :key="link._id"
@@ -135,7 +135,7 @@
                   </a>
                   <button
                     @click="copyLink(link.code)"
-                    class="opacity-0 group-hover:opacity-100 p-1 rounded text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 transition-all"
+                    class="opacity-0 group-hover:opacity-100 p-1 rounded text-gray-500 hover:text-gray-700 dark:hover:text-slate-200 transition-all"
                     :title="copied === link.code ? $t('common.copied') : $t('common.copy')"
                   >
                     <svg v-if="copied !== link.code" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,7 +150,7 @@
               </td>
               <!-- Destination URL -->
               <td class="px-4 py-3 max-w-[220px]">
-                <span class="text-xs text-gray-500 dark:text-slate-500 truncate block" :title="link.destinationUrl">
+                <span class="text-xs text-gray-600 dark:text-slate-400 truncate block" :title="link.destinationUrl">
                   {{ link.destinationUrl }}
                 </span>
               </td>
@@ -175,7 +175,7 @@
                 </span>
               </td>
               <!-- Created At -->
-              <td class="px-4 py-3.5 text-xs text-gray-500 dark:text-slate-500">
+              <td class="px-4 py-3.5 text-xs text-gray-600 dark:text-slate-400">
                 {{ formatDate(link.createdAt) }}
               </td>
               <!-- Expired At -->
@@ -188,28 +188,28 @@
               <td class="px-4 py-3.5">
                 <div class="flex justify-end gap-1">
                   <button @click="analyticsLink = link" title="Analytics"
-                    class="p-1.5 rounded-lg text-violet-400 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-all">
+                    class="p-1.5 rounded-lg text-violet-500 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-all">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                   </button>
                   <button @click="ui.openLogs(link)" :title="$t('common.viewLogs')"
-                    class="p-1.5 rounded-lg text-gray-400 dark:text-slate-600 hover:text-gray-600 dark:hover:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700 transition-all">
+                    class="p-1.5 rounded-lg text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 transition-all">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
                   </button>
                   <button @click="ui.openEdit(link)" :title="$t('common.edit')"
-                    class="p-1.5 rounded-lg text-blue-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all">
+                    class="p-1.5 rounded-lg text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </button>
                   <button @click="handleDelete(link._id)" :title="$t('common.delete')"
-                    class="p-1.5 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all">
+                    class="p-1.5 rounded-lg text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -223,7 +223,7 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="filteredLinks.length > 0" class="flex items-center justify-between px-5 py-3 border-t border-gray-100 dark:border-slate-800 gap-4">
+      <div v-if="filteredLinks.length > 0" class="flex items-center justify-between px-5 py-3 border-t border-gray-200 dark:border-slate-700 gap-4">
         <!-- Left: total -->
         <span class="text-sm font-medium text-gray-600 dark:text-slate-400 shrink-0">
           {{ $t('urls.total', { n: filteredLinks.length }) }}

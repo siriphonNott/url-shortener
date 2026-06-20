@@ -5,7 +5,7 @@
   >
     <!-- Title row + Icon -->
     <div class="flex items-start justify-between mb-2">
-      <p class="text-sm font-medium text-gray-500 dark:text-slate-500">{{ title }}</p>
+      <p class="text-sm font-medium text-gray-700 dark:text-slate-300">{{ title }}</p>
       <!-- Icon -->
       <div
         class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border-2"
@@ -40,7 +40,7 @@
         <p class="text-3xl font-bold text-gray-900 dark:text-slate-100 leading-none">
           {{ value.toLocaleString() }}
         </p>
-        <p class="text-xs text-gray-400 dark:text-slate-600 mt-2">last 7 days</p>
+        <p class="text-xs text-gray-500 dark:text-slate-500 mt-2">last 7 days</p>
       </div>
       <div ref="canvasWrapRef" class="w-28 h-14 shrink-0">
         <canvas ref="canvasRef" />
@@ -56,11 +56,11 @@
     >
       <div
         v-if="tooltipState.visible"
-        class="absolute z-30 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-100 dark:border-slate-700 px-3 py-2.5 pointer-events-none min-w-[130px]"
+        class="absolute z-30 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-200 dark:border-slate-700 px-3 py-2.5 pointer-events-none min-w-[130px]"
         :style="tooltipStyle"
       >
         <p class="text-xs font-semibold text-gray-700 dark:text-slate-200">{{ tooltipState.date }}</p>
-        <p class="text-xs text-gray-500 dark:text-slate-400 mt-1">
+        <p class="text-xs text-gray-600 dark:text-slate-400 mt-1">
           {{ labelUnit }}&nbsp;<span class="font-bold text-gray-800 dark:text-slate-100">{{ tooltipState.value }}</span>
         </p>
       </div>

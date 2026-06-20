@@ -17,7 +17,7 @@
             <h2 class="text-base font-bold text-gray-900 dark:text-slate-100 leading-tight">
               {{ data?.link?.title || link.code }}
             </h2>
-            <p class="text-xs text-gray-400 dark:text-slate-500 font-mono mt-0.5">{{ baseShortUrl }}/{{ link.code }}</p>
+            <p class="text-xs text-gray-500 dark:text-slate-400 font-mono mt-0.5">{{ baseShortUrl }}/{{ link.code }}</p>
           </div>
         </div>
         <button
@@ -48,7 +48,7 @@
               class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700/60 p-4">
               <div class="flex items-start justify-between">
                 <div>
-                  <p class="text-xs text-gray-500 dark:text-slate-500 font-medium">{{ card.label }}</p>
+                  <p class="text-xs text-gray-700 dark:text-slate-300 font-medium">{{ card.label }}</p>
                   <p class="text-2xl font-bold text-gray-900 dark:text-slate-100 mt-1">{{ card.value.toLocaleString() }}</p>
                 </div>
                 <div :class="`w-9 h-9 rounded-xl bg-gradient-to-br ${card.color} flex items-center justify-center shadow-sm shrink-0`">
@@ -64,11 +64,11 @@
           <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700/60 p-5">
             <div class="flex items-center justify-between mb-4">
               <h4 class="text-sm font-bold text-gray-900 dark:text-slate-100">{{ $t('dashboard.engagementTimeline') }}</h4>
-              <span class="text-xs text-gray-400 dark:text-slate-500">{{ $t('dashboard.last7Days') }}</span>
+              <span class="text-xs text-gray-500 dark:text-slate-400">{{ $t('dashboard.last7Days') }}</span>
             </div>
             <div class="h-40">
               <Bar v-if="timelineChartData" :data="timelineChartData" :options="chartOptions" />
-              <div v-else class="h-full flex items-center justify-center text-sm text-gray-400 dark:text-slate-600">{{ $t('common.noData') }}</div>
+              <div v-else class="h-full flex items-center justify-center text-sm text-gray-500 dark:text-slate-500">{{ $t('common.noData') }}</div>
             </div>
           </div>
 
@@ -80,13 +80,13 @@
               <div class="flex flex-col items-center">
                 <div class="h-36 w-full max-w-[160px]">
                   <Doughnut v-if="deviceChartData" :data="deviceChartData" :options="doughnutOptions" />
-                  <div v-else class="h-full flex items-center justify-center text-xs text-gray-400 dark:text-slate-600">{{ $t('common.noData') }}</div>
+                  <div v-else class="h-full flex items-center justify-center text-xs text-gray-500 dark:text-slate-500">{{ $t('common.noData') }}</div>
                 </div>
                 <div v-if="groupedDevices?.length" class="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 justify-center">
                   <div v-for="d in groupedDevices" :key="d.name" class="flex items-center gap-1.5 text-xs text-gray-600 dark:text-slate-400">
                     <span class="w-2 h-2 rounded-full shrink-0" :style="{ background: DEVICE_COLORS[d.name] ?? '#9ca3af' }" />
                     <span>{{ d.name }}</span>
-                    <span class="text-gray-400 dark:text-slate-600">{{ d.count }}</span>
+                    <span class="text-gray-500 dark:text-slate-500">{{ d.count }}</span>
                   </div>
                 </div>
               </div>
@@ -98,7 +98,7 @@
               <div class="flex flex-col items-center">
                 <div class="h-36 w-full max-w-[160px]">
                   <Doughnut v-if="trafficChartData" :data="trafficChartData" :options="doughnutOptions" />
-                  <div v-else class="h-full flex items-center justify-center text-xs text-gray-400 dark:text-slate-600">{{ $t('common.noData') }}</div>
+                  <div v-else class="h-full flex items-center justify-center text-xs text-gray-500 dark:text-slate-500">{{ $t('common.noData') }}</div>
                 </div>
                 <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 justify-center">
                   <div class="flex items-center gap-1.5 text-xs text-gray-600 dark:text-slate-400">
@@ -122,18 +122,18 @@
                   class="text-xs px-2.5 py-1 rounded-md font-medium transition-colors"
                   :class="locationTab === tab
                     ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 shadow-sm'
-                    : 'text-gray-500 dark:text-slate-500 hover:text-gray-700'"
+                    : 'text-gray-700 dark:text-slate-300 hover:text-gray-700'"
                 >{{ tab === 'countries' ? $t('dashboard.countries') : $t('dashboard.cities') }}</button>
               </div>
             </div>
             <div class="space-y-2.5">
               <div v-for="(row, i) in locationRows" :key="row.name" class="flex items-center gap-3">
-                <span class="text-xs text-gray-400 dark:text-slate-600 w-4 text-right shrink-0">{{ i + 1 }}</span>
+                <span class="text-xs text-gray-500 dark:text-slate-500 w-4 text-right shrink-0">{{ i + 1 }}</span>
                 <span class="text-sm font-medium text-gray-800 dark:text-slate-200 w-28 shrink-0 truncate">{{ row.name }}</span>
                 <div class="flex-1 bg-gray-100 dark:bg-slate-800 rounded-full h-1.5">
                   <div class="h-1.5 rounded-full bg-blue-500" :style="{ width: row.percent + '%' }" />
                 </div>
-                <span class="text-xs text-gray-500 dark:text-slate-500 w-6 text-right shrink-0">{{ row.count }}</span>
+                <span class="text-xs text-gray-600 dark:text-slate-400 w-6 text-right shrink-0">{{ row.count }}</span>
               </div>
             </div>
           </div>

@@ -14,7 +14,7 @@
         </div>
         <div>
           <h2 class="text-base font-bold text-gray-900 dark:text-slate-100">{{ $t('profile.infoSection') }}</h2>
-          <p class="text-sm text-gray-500 dark:text-slate-500">{{ $t('profile.infoDesc') }}</p>
+          <p class="text-sm text-gray-600 dark:text-slate-400">{{ $t('profile.infoDesc') }}</p>
         </div>
       </div>
 
@@ -22,7 +22,7 @@
       <div class="space-y-3">
         <!-- Full Name -->
         <div class="relative border border-gray-200 dark:border-slate-700 rounded-xl px-4 pt-5 pb-3 focus-within:border-blue-500 dark:focus-within:border-blue-500 transition-colors">
-          <label class="absolute top-2 left-4 text-xs text-gray-400 dark:text-slate-500 font-medium">{{ $t('profile.fullName') }}</label>
+          <label class="absolute top-2 left-4 text-xs text-gray-500 dark:text-slate-400 font-medium">{{ $t('profile.fullName') }}</label>
           <input
             v-model="profileForm.fullName"
             type="text"
@@ -34,12 +34,12 @@
 
         <!-- Email (read-only) -->
         <div class="relative border border-gray-200 dark:border-slate-700 rounded-xl px-4 pt-5 pb-3 bg-gray-50 dark:bg-slate-800/50">
-          <label class="absolute top-2 left-4 text-xs text-gray-400 dark:text-slate-500 font-medium">{{ $t('auth.email') }}</label>
+          <label class="absolute top-2 left-4 text-xs text-gray-500 dark:text-slate-400 font-medium">{{ $t('auth.email') }}</label>
           <input
             :value="auth.user?.email"
             type="email"
             disabled
-            class="w-full text-sm text-gray-500 dark:text-slate-400 bg-transparent cursor-default focus:outline-none"
+            class="w-full text-sm text-gray-600 dark:text-slate-400 bg-transparent cursor-default focus:outline-none"
           />
         </div>
       </div>
@@ -80,11 +80,11 @@
     <div class="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700/60 shadow-sm p-6">
       <div class="mb-5">
         <h2 class="text-base font-bold text-gray-900 dark:text-slate-100">{{ $t('profile.passwordSection') }}</h2>
-        <p class="text-sm text-gray-500 dark:text-slate-500">{{ $t('profile.passwordDesc') }}</p>
+        <p class="text-sm text-gray-600 dark:text-slate-400">{{ $t('profile.passwordDesc') }}</p>
       </div>
 
       <template v-if="!changingPassword">
-        <p class="text-sm text-gray-500 dark:text-slate-500 mb-5">{{ $t('profile.passwordNote') }}</p>
+        <p class="text-sm text-gray-600 dark:text-slate-400 mb-5">{{ $t('profile.passwordNote') }}</p>
         <div class="flex justify-end">
           <button
             @click="changingPassword = true"
@@ -99,14 +99,14 @@
         <div class="space-y-3">
           <!-- Current Password -->
           <div class="relative border border-gray-200 dark:border-slate-700 rounded-xl px-4 pt-5 pb-3 focus-within:border-blue-500 dark:focus-within:border-blue-500 transition-colors">
-            <label class="absolute top-2 left-4 text-xs text-gray-400 dark:text-slate-500 font-medium">{{ $t('profile.currentPassword') }}</label>
+            <label class="absolute top-2 left-4 text-xs text-gray-500 dark:text-slate-400 font-medium">{{ $t('profile.currentPassword') }}</label>
             <div class="flex items-center gap-2">
               <input
                 v-model="pwForm.current"
                 :type="showCurrent ? 'text' : 'password'"
                 class="flex-1 text-sm text-gray-800 dark:text-slate-200 bg-transparent focus:outline-none"
               />
-              <button type="button" @click="showCurrent = !showCurrent" class="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 shrink-0">
+              <button type="button" @click="showCurrent = !showCurrent" class="text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path v-if="showCurrent" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
@@ -119,14 +119,14 @@
 
           <!-- New Password -->
           <div class="relative border border-gray-200 dark:border-slate-700 rounded-xl px-4 pt-5 pb-3 focus-within:border-blue-500 dark:focus-within:border-blue-500 transition-colors">
-            <label class="absolute top-2 left-4 text-xs text-gray-400 dark:text-slate-500 font-medium">{{ $t('profile.newPassword') }}</label>
+            <label class="absolute top-2 left-4 text-xs text-gray-500 dark:text-slate-400 font-medium">{{ $t('profile.newPassword') }}</label>
             <div class="flex items-center gap-2">
               <input
                 v-model="pwForm.newPw"
                 :type="showNew ? 'text' : 'password'"
                 class="flex-1 text-sm text-gray-800 dark:text-slate-200 bg-transparent focus:outline-none"
               />
-              <button type="button" @click="showNew = !showNew" class="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 shrink-0">
+              <button type="button" @click="showNew = !showNew" class="text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path v-if="showNew" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />

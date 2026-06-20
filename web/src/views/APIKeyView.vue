@@ -16,7 +16,7 @@
 
       <div>
         <h2 class="text-base font-bold text-gray-900 dark:text-slate-100">{{ $t('apiKey.yourKey') }}</h2>
-        <p class="mt-1 text-sm text-gray-500 dark:text-slate-500">{{ $t('apiKey.keepSecure') }}</p>
+        <p class="mt-1 text-sm text-gray-600 dark:text-slate-400">{{ $t('apiKey.keepSecure') }}</p>
       </div>
 
       <!-- Key display -->
@@ -27,7 +27,7 @@
         >{{ auth.apiKey }}</code>
         <button
           @click="showKey = !showKey"
-          class="shrink-0 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition-colors"
+          class="shrink-0 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 transition-colors"
           :title="showKey ? $t('apiKey.hide') : $t('apiKey.show')"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -39,7 +39,7 @@
         </button>
         <button
           @click="copyKey"
-          class="shrink-0 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition-colors"
+          class="shrink-0 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 transition-colors"
           :title="$t('common.copy')"
         >
           <svg v-if="copied" class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -64,12 +64,12 @@
               : 'bg-gray-200 dark:bg-slate-700 text-gray-500 dark:text-slate-400'"
           >{{ auth.apiKeyStatus }}</span>
         </div>
-        <p class="text-xs text-gray-400 dark:text-slate-600">{{ $t('apiKey.maskedNote') }}</p>
+        <p class="text-xs text-gray-500 dark:text-slate-500">{{ $t('apiKey.maskedNote') }}</p>
       </div>
 
       <!-- No key yet -->
       <div v-else-if="!loading" class="bg-gray-50 dark:bg-slate-800 border border-dashed border-gray-300 dark:border-slate-600 rounded-xl px-4 py-6 text-center">
-        <p class="text-sm text-gray-500 dark:text-slate-400">{{ $t('apiKey.noKey') }}</p>
+        <p class="text-sm text-gray-600 dark:text-slate-400">{{ $t('apiKey.noKey') }}</p>
       </div>
 
       <!-- Generate / Regenerate -->
@@ -90,7 +90,7 @@
         {{ regenerating ? $t('apiKey.generating') : (hasOrFresh ? $t('apiKey.regenerate') : $t('apiKey.generate')) }}
       </button>
 
-      <p v-if="hasOrFresh" class="text-xs text-gray-400 dark:text-slate-600 text-center">
+      <p v-if="hasOrFresh" class="text-xs text-gray-500 dark:text-slate-500 text-center">
         {{ $t('apiKey.regenerateWarning') }}
       </p>
     </div>

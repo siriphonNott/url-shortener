@@ -4,14 +4,14 @@
     <!-- Page header -->
     <div class="text-center mb-10">
       <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-slate-100">Documentation</h1>
-      <p class="mt-2 text-base text-gray-500 dark:text-slate-400">Everything you need to know about using blly.to – Link Shortener</p>
+      <p class="mt-2 text-base text-gray-600 dark:text-slate-400">Everything you need to know about using blly.to – Link Shortener</p>
     </div>
 
     <div class="flex gap-8 items-start">
 
       <!-- TOC sidebar -->
       <aside class="hidden lg:block w-44 shrink-0 sticky top-6">
-        <p class="text-xs font-semibold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-3">On this page</p>
+        <p class="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-3">On this page</p>
         <nav class="space-y-0.5">
           <a
             v-for="item in tocItems"
@@ -20,12 +20,12 @@
             class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm transition-colors duration-150"
             :class="activeSection === item.id
               ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 font-medium'
-              : 'text-gray-500 dark:text-slate-500 hover:text-gray-800 dark:hover:text-slate-300'"
+              : 'text-gray-700 dark:text-slate-300 hover:text-gray-800 dark:hover:text-slate-300'"
           >
             <span class="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
               :class="activeSection === item.id ? 'bg-blue-100 dark:bg-blue-900/40' : 'bg-gray-100 dark:bg-slate-800'"
             >
-              <component :is="'svg'" class="w-2.5 h-2.5" :class="activeSection === item.id ? 'text-blue-500' : 'text-gray-400 dark:text-slate-500'"
+              <component :is="'svg'" class="w-2.5 h-2.5" :class="activeSection === item.id ? 'text-blue-500' : 'text-gray-500 dark:text-slate-400'"
                 fill="none" stroke="currentColor" viewBox="0 0 24 24" v-html="item.iconPath"
               />
             </span>
@@ -141,7 +141,7 @@
                 <div class="min-w-0">
                   <code class="text-base font-mono font-semibold text-gray-800 dark:text-slate-100 break-all">{{ ep.path }}</code>
                   <p class="mt-1 text-sm font-semibold text-gray-700 dark:text-slate-300">{{ ep.title }}</p>
-                  <p class="mt-0.5 text-sm text-gray-500 dark:text-slate-500">{{ ep.desc }}</p>
+                  <p class="mt-0.5 text-sm text-gray-600 dark:text-slate-400">{{ ep.desc }}</p>
                 </div>
               </div>
 
@@ -149,15 +149,15 @@
                 <!-- Body params -->
                 <div v-if="ep.body">
                   <p class="text-sm font-semibold text-gray-700 dark:text-slate-300 mb-3">Request body</p>
-                  <div class="rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden divide-y divide-gray-100 dark:divide-slate-700/60">
+                  <div class="rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden divide-y divide-gray-200 dark:divide-slate-700/60">
                     <div v-for="param in ep.body" :key="param.name"
                       class="flex items-start gap-4 px-4 py-3 text-sm bg-white dark:bg-slate-900">
                       <code class="font-mono text-blue-600 dark:text-blue-400 shrink-0 w-28">{{ param.name }}</code>
-                      <span class="text-gray-400 dark:text-slate-600 shrink-0 w-16 text-xs mt-0.5">{{ param.type }}</span>
-                      <span class="shrink-0 text-xs mt-0.5 font-medium" :class="param.required ? 'text-red-500' : 'text-gray-400 dark:text-slate-600'">
+                      <span class="text-gray-500 dark:text-slate-500 shrink-0 w-16 text-xs mt-0.5">{{ param.type }}</span>
+                      <span class="shrink-0 text-xs mt-0.5 font-medium" :class="param.required ? 'text-red-500' : 'text-gray-500 dark:text-slate-500'">
                         {{ param.required ? 'required' : 'optional' }}
                       </span>
-                      <span class="text-gray-500 dark:text-slate-400 text-xs mt-0.5">{{ param.desc }}</span>
+                      <span class="text-gray-600 dark:text-slate-400 text-xs mt-0.5">{{ param.desc }}</span>
                     </div>
                   </div>
                 </div>
@@ -172,7 +172,7 @@
                       class="text-sm px-4 py-2 rounded-t-xl font-medium transition-colors duration-150"
                       :class="activeTab(ep.title) === tab
                         ? 'bg-gray-950 text-slate-200'
-                        : 'bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-500 hover:text-gray-700 dark:hover:text-slate-300'"
+                        : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:text-gray-700 dark:hover:text-slate-300'"
                     >{{ tab }}</button>
                   </div>
                   <div class="bg-gray-950 rounded-b-xl rounded-tr-xl overflow-x-auto">
@@ -213,12 +213,12 @@
             <table class="w-full text-sm border-collapse">
               <thead>
                 <tr class="border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/70">
-                  <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Error Code</th>
-                  <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap w-24">Status</th>
-                  <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Description</th>
+                  <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wider whitespace-nowrap">Error Code</th>
+                  <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wider whitespace-nowrap w-24">Status</th>
+                  <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wider whitespace-nowrap">Description</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-gray-100 dark:divide-slate-700/60">
+              <tbody class="divide-y divide-gray-200 dark:divide-slate-700/60">
                 <template v-for="group in errorGroups" :key="group.label">
                   <tr class="bg-gray-50/60 dark:bg-slate-800/30">
                     <td colspan="3" class="px-5 py-2.5">
@@ -239,7 +239,7 @@
                     <td class="px-5 py-3.5">
                       <span class="inline-flex items-center text-xs font-bold px-2.5 py-1 rounded-lg font-mono tabular-nums" :class="statusClass(err.status)">{{ err.status }}</span>
                     </td>
-                    <td class="px-5 py-3.5 text-gray-500 dark:text-slate-400 leading-relaxed">{{ err.message }}</td>
+                    <td class="px-5 py-3.5 text-gray-600 dark:text-slate-400 leading-relaxed">{{ err.message }}</td>
                   </tr>
                 </template>
               </tbody>

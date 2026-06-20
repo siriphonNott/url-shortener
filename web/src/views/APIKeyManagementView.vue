@@ -5,7 +5,7 @@
     <div class="flex items-center justify-between mb-4">
       <div>
         <h1 class="text-2xl font-bold text-gray-900 dark:text-slate-100">{{ $t('apiKeyMgmt.title') }}</h1>
-        <p class="mt-1 text-sm text-gray-500 dark:text-slate-500">{{ $t('apiKeyMgmt.total', { n: store.pagination.total }) }}</p>
+        <p class="mt-1 text-sm text-gray-600 dark:text-slate-400">{{ $t('apiKeyMgmt.total', { n: store.pagination.total }) }}</p>
       </div>
       <button
         @click="openCreate"
@@ -30,9 +30,9 @@
     <div class="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700/60 shadow-sm overflow-hidden">
 
       <!-- Search + Filter -->
-      <div class="p-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between gap-3">
+      <div class="p-4 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between gap-3">
         <div class="relative flex-1 max-w-sm">
-          <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-slate-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
@@ -68,29 +68,29 @@
 
       <div v-else-if="!store.keys.length" class="flex flex-col items-center justify-center py-16 text-center">
         <div class="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-slate-800 flex items-center justify-center mb-4">
-          <svg class="w-7 h-7 text-gray-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-7 h-7 text-gray-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
           </svg>
         </div>
-        <p class="text-sm font-medium text-gray-500 dark:text-slate-400">{{ $t('apiKeyMgmt.noKeys') }}</p>
-        <p class="text-xs text-gray-400 dark:text-slate-500 mt-1">{{ $t('apiKeyMgmt.noKeysHint') }}</p>
+        <p class="text-sm font-medium text-gray-600 dark:text-slate-400">{{ $t('apiKeyMgmt.noKeys') }}</p>
+        <p class="text-xs text-gray-500 dark:text-slate-400 mt-1">{{ $t('apiKeyMgmt.noKeysHint') }}</p>
       </div>
 
       <div v-else class="overflow-x-auto">
         <table class="w-full text-sm">
           <thead>
-            <tr class="border-b border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50">
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wide whitespace-nowrap">{{ $t('apiKeyMgmt.keyNameCol') }}</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wide whitespace-nowrap">{{ $t('apiKeyMgmt.apiKeyCol') }}</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wide whitespace-nowrap">{{ $t('apiKeyMgmt.userCol') }}</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wide whitespace-nowrap">{{ $t('apiKeyMgmt.scopesCol') }}</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wide whitespace-nowrap">{{ $t('common.status') }}</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wide whitespace-nowrap">{{ $t('apiKeyMgmt.expiresCol') }}</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wide whitespace-nowrap">{{ $t('apiKeyMgmt.lastUsedCol') }}</th>
+            <tr class="border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap">{{ $t('apiKeyMgmt.keyNameCol') }}</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap">{{ $t('apiKeyMgmt.apiKeyCol') }}</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap">{{ $t('apiKeyMgmt.userCol') }}</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap">{{ $t('apiKeyMgmt.scopesCol') }}</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap">{{ $t('common.status') }}</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap">{{ $t('apiKeyMgmt.expiresCol') }}</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap">{{ $t('apiKeyMgmt.lastUsedCol') }}</th>
               <th class="px-4 py-3 w-20" />
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-50 dark:divide-slate-800">
+          <tbody class="divide-y divide-gray-200 dark:divide-slate-700/70">
             <tr
               v-for="key in store.keys"
               :key="key.id"
@@ -106,7 +106,7 @@
                   </div>
                   <div>
                     <p class="font-semibold text-gray-800 dark:text-slate-100 leading-tight">{{ key.keyName }}</p>
-                    <p class="text-xs text-gray-400 dark:text-slate-500 mt-0.5">{{ formatDate(key.createdAt) }}</p>
+                    <p class="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{{ formatDate(key.createdAt) }}</p>
                   </div>
                 </div>
               </td>
@@ -119,7 +119,7 @@
                   </code>
                   <button
                     @click="copyApiKey(key)"
-                    class="opacity-0 group-hover:opacity-100 p-1 rounded text-gray-400 hover:text-blue-500 transition-all"
+                    class="opacity-0 group-hover:opacity-100 p-1 rounded text-gray-500 hover:text-blue-500 transition-all"
                     :title="copiedId === key.id ? $t('common.copied') : $t('apiKeyMgmt.copyFullKey')"
                   >
                     <svg v-if="copiedId === key.id" class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -140,10 +140,10 @@
                   </div>
                   <div>
                     <p class="text-sm font-medium text-gray-700 dark:text-slate-200 leading-tight">{{ key.user.fullName || key.user.email?.split('@')[0] }}</p>
-                    <p class="text-xs text-gray-400 dark:text-slate-500">{{ key.user.email }}</p>
+                    <p class="text-xs text-gray-500 dark:text-slate-400">{{ key.user.email }}</p>
                   </div>
                 </div>
-                <span v-else class="text-xs text-gray-400 dark:text-slate-500">—</span>
+                <span v-else class="text-xs text-gray-500 dark:text-slate-400">—</span>
               </td>
 
               <!-- Scopes -->
@@ -175,7 +175,7 @@
               <!-- Expires -->
               <td class="px-4 py-3.5">
                 <span v-if="key.expiresAt" class="text-xs text-gray-600 dark:text-slate-300">{{ formatDate(key.expiresAt) }}</span>
-                <span v-else class="inline-flex items-center gap-1 text-xs text-gray-400 dark:text-slate-500">
+                <span v-else class="inline-flex items-center gap-1 text-xs text-gray-500 dark:text-slate-400">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
                   Never
                 </span>
@@ -184,7 +184,7 @@
               <!-- Last Used -->
               <td class="px-4 py-3.5">
                 <span v-if="key.lastUsedAt" class="text-xs text-gray-600 dark:text-slate-300">{{ formatRelative(key.lastUsedAt) }}</span>
-                <span v-else class="text-xs text-gray-400 dark:text-slate-500">—</span>
+                <span v-else class="text-xs text-gray-500 dark:text-slate-400">—</span>
               </td>
 
               <!-- Actions -->
@@ -192,7 +192,7 @@
                 <div class="flex items-center gap-1 justify-end">
                   <button
                     @click="openStats(key)"
-                    class="p-1.5 rounded-lg text-gray-400 dark:text-slate-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors"
+                    class="p-1.5 rounded-lg text-gray-500 dark:text-slate-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors"
                     :title="$t('apiKeyMgmt.analyticsTitle')"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -201,7 +201,7 @@
                   </button>
                   <button
                     @click="openEdit(key)"
-                    class="p-1.5 rounded-lg text-gray-400 dark:text-slate-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+                    class="p-1.5 rounded-lg text-gray-500 dark:text-slate-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
                     :title="$t('common.edit')"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -210,7 +210,7 @@
                   </button>
                   <button
                     @click="openDelete(key)"
-                    class="p-1.5 rounded-lg text-gray-400 dark:text-slate-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+                    class="p-1.5 rounded-lg text-gray-500 dark:text-slate-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 dark:hover:text-red-400 transition-colors"
                     :title="$t('common.delete')"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -225,7 +225,7 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="store.pagination.total > 0" class="flex items-center justify-between px-5 py-3 border-t border-gray-100 dark:border-slate-800 gap-4">
+      <div v-if="store.pagination.total > 0" class="flex items-center justify-between px-5 py-3 border-t border-gray-200 dark:border-slate-700 gap-4">
         <span class="text-sm font-medium text-gray-600 dark:text-slate-400 shrink-0">
           {{ $t('apiKeyMgmt.total', { n: store.pagination.total }) }}
         </span>
@@ -259,7 +259,7 @@
           </button>
         </div>
         <div class="flex items-center gap-2 shrink-0">
-          <span class="text-sm text-gray-500 dark:text-slate-500">{{ $t('common.showPerPage') }}</span>
+          <span class="text-sm text-gray-600 dark:text-slate-400">{{ $t('common.showPerPage') }}</span>
           <div class="w-20">
             <AppSelect
               v-model="perPage"
@@ -275,10 +275,10 @@
     <!-- ── Create / Edit Modal ── -->
     <Teleport to="body">
       <div v-if="showModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" @click.self="closeModal">
-        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md border border-gray-100 dark:border-slate-700">
-          <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100 dark:border-slate-800">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md border border-gray-200 dark:border-slate-700">
+          <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-200 dark:border-slate-700">
             <h3 class="text-base font-bold text-gray-900 dark:text-slate-100">{{ editing ? $t('apiKeyMgmt.editTitle') : $t('apiKeyMgmt.newTitle') }}</h3>
-            <button @click="closeModal" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+            <button @click="closeModal" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -314,16 +314,16 @@
                   {{ (selectedUser.fullName || selectedUser.email).charAt(0) }}
                 </div>
                 <div v-else class="w-7 h-7 rounded-lg bg-gray-100 dark:bg-slate-700 flex items-center justify-center shrink-0">
-                  <svg class="w-3.5 h-3.5 text-gray-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-3.5 h-3.5 text-gray-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                 </div>
                 <div class="flex-1 min-w-0">
                   <p v-if="selectedUser" class="text-sm font-medium text-gray-800 dark:text-slate-200 truncate leading-tight">{{ selectedUser.fullName || selectedUser.email?.split('@')[0] }}</p>
-                  <p v-else class="text-sm text-gray-400 dark:text-slate-500">{{ $t('apiKeyMgmt.selfOption') }}</p>
-                  <p v-if="selectedUser" class="text-xs text-gray-400 dark:text-slate-500 truncate">{{ selectedUser.email }}</p>
+                  <p v-else class="text-sm text-gray-500 dark:text-slate-400">{{ $t('apiKeyMgmt.selfOption') }}</p>
+                  <p v-if="selectedUser" class="text-xs text-gray-500 dark:text-slate-400 truncate">{{ selectedUser.email }}</p>
                 </div>
-                <svg class="w-4 h-4 text-gray-400 dark:text-slate-500 shrink-0 transition-transform duration-200" :class="userDropdownOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 text-gray-500 dark:text-slate-400 shrink-0 transition-transform duration-200" :class="userDropdownOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
@@ -339,9 +339,9 @@
               >
                 <div v-if="userDropdownOpen" class="absolute z-50 left-0 right-0 mt-1.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-xl overflow-hidden">
                   <!-- Search -->
-                  <div class="p-2 border-b border-gray-100 dark:border-slate-700">
+                  <div class="p-2 border-b border-gray-200 dark:border-slate-700">
                     <div class="relative">
-                      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 dark:text-slate-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 dark:text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                       </svg>
                       <input
@@ -364,7 +364,7 @@
                       :class="!form.userId ? 'bg-blue-50 dark:bg-blue-900/20' : ''"
                     >
                       <div class="w-7 h-7 rounded-lg bg-gray-100 dark:bg-slate-700 flex items-center justify-center shrink-0">
-                        <svg class="w-3.5 h-3.5 text-gray-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-3.5 h-3.5 text-gray-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                       </div>
@@ -388,14 +388,14 @@
                       </div>
                       <div class="flex-1 min-w-0">
                         <p class="text-sm font-medium text-gray-800 dark:text-slate-200 truncate leading-tight">{{ u.fullName || u.email?.split('@')[0] }}</p>
-                        <p class="text-xs text-gray-400 dark:text-slate-500 truncate">{{ u.email }}</p>
+                        <p class="text-xs text-gray-500 dark:text-slate-400 truncate">{{ u.email }}</p>
                       </div>
                       <svg v-if="form.userId === u.id" class="w-4 h-4 text-blue-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                       </svg>
                     </button>
 
-                    <p v-if="filteredUsers.length === 0 && userSearch" class="text-xs text-center text-gray-400 dark:text-slate-500 py-4">No users found</p>
+                    <p v-if="filteredUsers.length === 0 && userSearch" class="text-xs text-center text-gray-500 dark:text-slate-400 py-4">No users found</p>
                   </div>
                 </div>
               </Transition>
@@ -416,7 +416,7 @@
                       class="flex-1 text-xs py-1.5 font-medium transition-colors"
                       :class="form.scopes[ns.key] === opt.value
                         ? 'bg-blue-600 text-white'
-                        : 'text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800'"
+                        : 'text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800'"
                     >{{ opt.label }}</button>
                   </div>
                 </div>
@@ -438,7 +438,7 @@
 
             <!-- Expires At -->
             <div>
-              <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1.5">{{ $t('apiKeyMgmt.expiryDate') }} <span class="text-gray-400 dark:text-slate-500 font-normal">{{ $t('common.optional') }}</span></label>
+              <label class="block text-xs font-semibold text-gray-700 dark:text-slate-300 mb-1.5">{{ $t('apiKeyMgmt.expiryDate') }} <span class="text-gray-500 dark:text-slate-400 font-normal">{{ $t('common.optional') }}</span></label>
               <input
                 v-model="form.expiresAt"
                 type="date"
@@ -472,7 +472,7 @@
         <div class="bg-gray-50 dark:bg-slate-950 rounded-2xl shadow-2xl w-full max-w-2xl border border-gray-200 dark:border-slate-700 overflow-hidden max-h-[90vh] flex flex-col">
 
           <!-- Modal Header -->
-          <div class="bg-white dark:bg-slate-900 px-6 py-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between shrink-0">
+          <div class="bg-white dark:bg-slate-900 px-6 py-4 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between shrink-0">
             <div class="flex items-center gap-3">
               <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center shadow-sm">
                 <svg class="w-4.5 h-4.5 text-white w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -481,10 +481,10 @@
               </div>
               <div>
                 <h3 class="text-base font-bold text-gray-900 dark:text-slate-100 leading-tight">{{ statsModal.key?.keyName }}</h3>
-                <p class="text-xs text-gray-400 dark:text-slate-500 mt-0.5">{{ $t('apiKeyMgmt.analyticsOwner', { email: statsModal.key?.user?.email }) }}</p>
+                <p class="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{{ $t('apiKeyMgmt.analyticsOwner', { email: statsModal.key?.user?.email }) }}</p>
               </div>
             </div>
-            <button @click="statsModal.open = false" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+            <button @click="statsModal.open = false" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
           </div>
@@ -504,28 +504,28 @@
               <!-- Key Info Row -->
               <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700/60 p-4">
-                  <p class="text-xs text-gray-500 dark:text-slate-500 font-medium mb-1">Status</p>
+                  <p class="text-xs text-gray-700 dark:text-slate-300 font-medium mb-1">Status</p>
                   <span class="inline-flex items-center gap-1.5 text-xs font-bold px-2 py-0.5 rounded-full" :class="statusClass(statsModal.data.key.status)">
                     <span class="w-1.5 h-1.5 rounded-full bg-current" />{{ statsModal.data.key.status }}
                   </span>
                 </div>
                 <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700/60 p-4">
-                  <p class="text-xs text-gray-500 dark:text-slate-500 font-medium mb-1">Created</p>
+                  <p class="text-xs text-gray-700 dark:text-slate-300 font-medium mb-1">Created</p>
                   <p class="text-sm font-semibold text-gray-800 dark:text-slate-200">{{ formatDate(statsModal.data.key.createdAt) }}</p>
                 </div>
                 <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700/60 p-4">
-                  <p class="text-xs text-gray-500 dark:text-slate-500 font-medium mb-1">Last Used</p>
+                  <p class="text-xs text-gray-700 dark:text-slate-300 font-medium mb-1">Last Used</p>
                   <p class="text-sm font-semibold text-gray-800 dark:text-slate-200">{{ statsModal.data.key.lastUsedAt ? formatRelative(statsModal.data.key.lastUsedAt) : '—' }}</p>
                 </div>
                 <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700/60 p-4">
-                  <p class="text-xs text-gray-500 dark:text-slate-500 font-medium mb-1">Expires</p>
+                  <p class="text-xs text-gray-700 dark:text-slate-300 font-medium mb-1">Expires</p>
                   <p class="text-sm font-semibold text-gray-800 dark:text-slate-200">{{ statsModal.data.key.expiresAt ? formatDate(statsModal.data.key.expiresAt) : 'Never' }}</p>
                 </div>
               </div>
 
               <!-- Scopes -->
               <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700/60 px-4 py-3 flex items-center gap-3">
-                <p class="text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wider shrink-0">Scopes</p>
+                <p class="text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wider shrink-0">Scopes</p>
                 <div class="flex flex-wrap gap-1.5">
                   <span
                     v-for="(val, ns) in statsModal.data.key.scopes" :key="ns"
@@ -546,7 +546,7 @@
                 >
                   <div class="flex items-start justify-between">
                     <div>
-                      <p class="text-xs text-gray-500 dark:text-slate-500 font-medium">{{ card.label }}</p>
+                      <p class="text-xs text-gray-700 dark:text-slate-300 font-medium">{{ card.label }}</p>
                       <p class="text-2xl font-bold text-gray-900 dark:text-slate-100 mt-1">{{ card.value.toLocaleString() }}</p>
                     </div>
                     <div :class="`w-9 h-9 rounded-xl bg-gradient-to-br ${card.color} flex items-center justify-center shadow-sm shrink-0`">
@@ -562,11 +562,11 @@
               <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700/60 p-5">
                 <div class="flex items-center justify-between mb-4">
                   <h4 class="text-sm font-bold text-gray-900 dark:text-slate-100">{{ $t('apiKeyMgmt.analyticsTitle') }}</h4>
-                  <span class="text-xs text-gray-400 dark:text-slate-500">{{ $t('dashboard.last7Days') }}</span>
+                  <span class="text-xs text-gray-500 dark:text-slate-400">{{ $t('dashboard.last7Days') }}</span>
                 </div>
                 <div class="h-40">
                   <Bar v-if="statsChartData" :data="statsChartData" :options="chartOptions" />
-                  <div v-else class="h-full flex items-center justify-center text-sm text-gray-400 dark:text-slate-600">{{ $t('common.noData') }}</div>
+                  <div v-else class="h-full flex items-center justify-center text-sm text-gray-500 dark:text-slate-500">{{ $t('common.noData') }}</div>
                 </div>
               </div>
 
@@ -579,7 +579,7 @@
                     <div class="flex-1 bg-gray-100 dark:bg-slate-800 rounded-full h-2">
                       <div class="h-2 rounded-full bg-blue-500" :style="{ width: (d.count / statsModal.data.devices.reduce((s, x) => s + x.count, 0) * 100).toFixed(0) + '%' }" />
                     </div>
-                    <span class="text-xs text-gray-500 dark:text-slate-500 w-8 text-right">{{ d.count }}</span>
+                    <span class="text-xs text-gray-600 dark:text-slate-400 w-8 text-right">{{ d.count }}</span>
                   </div>
                 </div>
               </div>
@@ -591,7 +591,7 @@
 
       <!-- ── Delete Confirm Modal ── -->
       <div v-if="deleteTarget" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" @click.self="deleteTarget = null">
-        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-sm border border-gray-100 dark:border-slate-700">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-sm border border-gray-200 dark:border-slate-700">
           <div class="px-6 pt-6 pb-4 text-center">
             <div class="w-14 h-14 bg-red-100 dark:bg-red-900/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <svg class="w-7 h-7 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -599,7 +599,7 @@
               </svg>
             </div>
             <h3 class="text-base font-bold text-gray-900 dark:text-slate-100">{{ $t('apiKeyMgmt.deleteTitle') }}</h3>
-            <p class="mt-2 text-sm text-gray-500 dark:text-slate-400">
+            <p class="mt-2 text-sm text-gray-600 dark:text-slate-400">
               {{ $t('apiKeyMgmt.deleteConfirm', { name: deleteTarget?.name || deleteTarget?.keyName }) }}
             </p>
           </div>

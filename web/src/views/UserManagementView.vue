@@ -5,7 +5,7 @@
     <div class="flex items-center justify-between mb-6">
       <div>
         <h1 class="text-2xl font-bold text-gray-900 dark:text-slate-100">{{ $t('users.title') }}</h1>
-        <p class="mt-1 text-sm text-gray-500 dark:text-slate-500">{{ $t('users.total', { n: store.pagination.total }) }}</p>
+        <p class="mt-1 text-sm text-gray-600 dark:text-slate-400">{{ $t('users.total', { n: store.pagination.total }) }}</p>
       </div>
       <button
         @click="openModal()"
@@ -22,9 +22,9 @@
     <div class="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700/60 shadow-sm overflow-hidden">
 
       <!-- Search + Filter -->
-      <div class="p-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between gap-3">
+      <div class="p-4 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between gap-3">
         <div class="relative flex-1 max-w-sm">
-          <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-slate-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
@@ -53,7 +53,7 @@
 
       <div class="overflow-x-auto">
         <!-- Loading -->
-        <div v-if="store.loading" class="p-16 flex flex-col items-center gap-3 text-gray-400 dark:text-slate-600">
+        <div v-if="store.loading" class="p-16 flex flex-col items-center gap-3 text-gray-500 dark:text-slate-500">
           <svg class="animate-spin w-6 h-6 text-blue-500" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
@@ -64,27 +64,27 @@
         <!-- Empty -->
         <div v-else-if="!store.users.length" class="p-16 flex flex-col items-center gap-3">
           <div class="w-14 h-14 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center">
-            <svg class="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-7 h-7 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
           </div>
           <p class="font-semibold text-gray-700 dark:text-slate-300">{{ $t('users.noUsers') }}</p>
-          <p class="text-sm text-gray-400 dark:text-slate-600">{{ $t('users.noUsersHint') }}</p>
+          <p class="text-sm text-gray-500 dark:text-slate-500">{{ $t('users.noUsersHint') }}</p>
         </div>
 
         <!-- Table -->
         <table v-else class="w-full text-sm">
           <thead>
-            <tr class="border-b border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50">
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wide whitespace-nowrap">{{ $t('users.userCol') }}</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wide whitespace-nowrap">{{ $t('users.accountTypeCol') }}</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wide whitespace-nowrap">{{ $t('users.rolesCol') }}</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wide whitespace-nowrap">{{ $t('common.status') }}</th>
-              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wide whitespace-nowrap">{{ $t('users.createdCol') }}</th>
-              <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500 dark:text-slate-500 uppercase tracking-wide">{{ $t('common.actions') }}</th>
+            <tr class="border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap">{{ $t('users.userCol') }}</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap">{{ $t('users.accountTypeCol') }}</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap">{{ $t('users.rolesCol') }}</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap">{{ $t('common.status') }}</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wide whitespace-nowrap">{{ $t('users.createdCol') }}</th>
+              <th class="px-4 py-3 text-right text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wide">{{ $t('common.actions') }}</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-50 dark:divide-slate-800">
+          <tbody class="divide-y divide-gray-200 dark:divide-slate-700/70">
             <tr
               v-for="user in store.users"
               :key="user.id"
@@ -99,7 +99,7 @@
                   </div>
                   <div class="min-w-0">
                     <p class="font-semibold text-gray-900 dark:text-slate-100 truncate">{{ user.fullName || '—' }}</p>
-                    <p class="text-xs text-gray-500 dark:text-slate-500 truncate">{{ user.email }}</p>
+                    <p class="text-xs text-gray-600 dark:text-slate-400 truncate">{{ user.email }}</p>
                   </div>
                 </div>
               </td>
@@ -112,7 +112,7 @@
               <!-- Roles -->
               <td class="px-4 py-3.5">
                 <div class="flex flex-wrap gap-1">
-                  <span v-if="!user.roles?.length" class="text-xs text-gray-400 dark:text-slate-600">—</span>
+                  <span v-if="!user.roles?.length" class="text-xs text-gray-500 dark:text-slate-500">—</span>
                   <span v-for="role in user.roles" :key="role.id"
                     class="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400">
                     {{ role.name }}
@@ -127,7 +127,7 @@
                 </span>
               </td>
               <!-- Created -->
-              <td class="px-4 py-3.5 text-gray-500 dark:text-slate-500 text-xs whitespace-nowrap">
+              <td class="px-4 py-3.5 text-gray-600 dark:text-slate-400 text-xs whitespace-nowrap">
                 {{ formatDate(user.createdAt) }}
               </td>
               <!-- Actions -->
@@ -135,7 +135,7 @@
                 <div class="flex items-center justify-end gap-2">
                   <button
                     @click="openModal(user)"
-                    class="p-1.5 rounded-lg text-gray-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                    class="p-1.5 rounded-lg text-gray-500 dark:text-slate-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
                     :title="$t('common.edit')"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -145,7 +145,7 @@
                   </button>
                   <button
                     @click="confirmDelete(user)"
-                    class="p-1.5 rounded-lg text-gray-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                    class="p-1.5 rounded-lg text-gray-500 dark:text-slate-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                     :title="$t('common.delete')"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -161,7 +161,7 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="store.pagination.total > 0" class="flex items-center justify-between px-5 py-3 border-t border-gray-100 dark:border-slate-800 gap-4">
+      <div v-if="store.pagination.total > 0" class="flex items-center justify-between px-5 py-3 border-t border-gray-200 dark:border-slate-700 gap-4">
         <span class="text-sm font-medium text-gray-600 dark:text-slate-400 shrink-0">
           {{ $t('users.total', { n: store.pagination.total }) }}
         </span>
@@ -195,7 +195,7 @@
           </button>
         </div>
         <div class="flex items-center gap-2 shrink-0">
-          <span class="text-sm text-gray-500 dark:text-slate-500">{{ $t('common.showPerPage') }}</span>
+          <span class="text-sm text-gray-600 dark:text-slate-400">{{ $t('common.showPerPage') }}</span>
           <div class="w-20">
             <AppSelect
               v-model="perPage"
@@ -225,9 +225,9 @@
             enter-to-class="opacity-100 scale-100"
           >
             <div v-if="showModal" class="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-slate-700">
-              <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-slate-700">
+              <div class="flex items-center justify-between px-6 py-5 border-b border-gray-200 dark:border-slate-700">
                 <h3 class="text-base font-bold text-gray-900 dark:text-slate-100">{{ editTarget ? $t('users.editTitle') : $t('users.addTitle') }}</h3>
-                <button @click="showModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 transition-colors">
+                <button @click="showModal = false" class="text-gray-500 hover:text-gray-700 dark:hover:text-slate-200 transition-colors">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                   </svg>
@@ -267,7 +267,7 @@
                         {{ role.name }}
                       </span>
                     </label>
-                    <span v-if="!rolesStore.roles.length" class="text-xs text-gray-400 dark:text-slate-500">{{ $t('users.noRoles') }}</span>
+                    <span v-if="!rolesStore.roles.length" class="text-xs text-gray-500 dark:text-slate-400">{{ $t('users.noRoles') }}</span>
                   </div>
                 </div>
 
@@ -341,7 +341,7 @@
             </div>
             <div class="text-center">
               <h3 class="text-base font-bold text-gray-900 dark:text-slate-100">{{ $t('users.deleteTitle') }}</h3>
-              <p class="mt-1 text-sm text-gray-500 dark:text-slate-400">
+              <p class="mt-1 text-sm text-gray-600 dark:text-slate-400">
                 {{ $t('users.deleteConfirm', { name: deleteTarget.fullName || deleteTarget.email }) }}
               </p>
             </div>
