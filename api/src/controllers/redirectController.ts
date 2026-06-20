@@ -3,20 +3,23 @@ import type { Env } from '../env';
 import { getDb } from '../db/client';
 import { links, redirectLogs } from '../db/schema';
 import { ERRORS } from '../lib/errorCodes';
+import { errorPageResponse } from '../lib/errorPage';
 import { nowIso } from '../lib/time';
 
-const errJson = (key: 'LINK_NOT_FOUND' | 'LINK_EXPIRED' | 'SERVER_ERROR') => {
+const errJson = (key: 'SERVER_ERROR') => {
   const e = ERRORS[key];
   return Response.json({ success: false, errorCode: e.code, message: e.message }, { status: e.status }); // FLAT, matches fail()
 };
 
 export async function handleRedirect(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   const code = new URL(request.url).pathname.slice(1);
+  const accept = request.headers.get('accept-language');
   const db = getDb(env);
   try {
     const link = await db.select().from(links).where(and(eq(links.code, code), eq(links.isActive, 1))).get();
-    if (!link) return errJson('LINK_NOT_FOUND');
-    if (link.expiresAt && new Date(link.expiresAt) < new Date()) return errJson('LINK_EXPIRED');
+    // Human-facing branded HTML page (unknown/inactive → 404, expired → 410) instead of a raw JSON envelope.
+    if (!link) return errorPageResponse('not-found', accept);
+    if (link.expiresAt && new Date(link.expiresAt) < new Date()) return errorPageResponse('expired', accept);
 
     const cf = (request as any).cf || {};
     const log = {
