@@ -5,6 +5,16 @@ All notable changes to this project are documented here. Format based on
 [Semantic Versioning](https://semver.org/). The version tracks the **root `package.json`**
 as the single project version — `api/` and `web/` `package.json` versions are independent build versions.
 
+## [1.3.0] - 2026-06-21
+
+### Added
+- **Animated "Live Demo" section on the landing page** (`web/src/components/UsageDemo.vue`, mounted in
+  `LandingView.vue` after the "How it works" steps). An auto-playing, looping mock-UI walkthrough of real usage:
+  paste & shorten → copy the short link → view analytics. Clickable step tabs (with a per-scene progress bar),
+  pause-on-hover, and a `prefers-reduced-motion` fallback that shows static end-states. No new dependencies —
+  pure CSS animations plus a `requestAnimationFrame` click counter; theme-aware (light/dark) and i18n-driven
+  (new `landing.demo*` keys in both `th.js` and `en.js`).
+
 ## [1.2.0] - 2026-06-21
 
 ### Added

@@ -205,6 +205,26 @@
       </div>
     </section>
 
+    <!-- ─── USAGE DEMO (animated) ─── -->
+    <section class="relative z-10 px-6 lg:px-12 pb-24" ref="demoRef">
+      <div class="max-w-2xl mx-auto" :class="{ 'section-visible': demoVisible }">
+        <div class="text-center mb-12">
+          <div class="section-fade inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-widest mb-4">
+            <div class="h-px w-8 bg-blue-500" />
+            {{ $t('landing.demoSection') }}
+            <div class="h-px w-8 bg-blue-500" />
+          </div>
+          <h2 class="section-fade text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight" style="animation-delay:0.1s">
+            {{ $t('landing.demoTitle') }}
+            <span class="bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">{{ $t('landing.demoGradient') }}</span>
+          </h2>
+        </div>
+        <div class="demo-fade">
+          <UsageDemo :active="demoVisible" />
+        </div>
+      </div>
+    </section>
+
     <!-- ─── API SECTION ─── -->
     <section class="relative z-10 px-6 lg:px-12 pb-24" ref="apiRef">
       <div class="max-w-5xl mx-auto" :class="{ 'section-visible': apiVisible }">
@@ -334,6 +354,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ThemeToggle from '../components/ThemeToggle.vue';
 import LanguageSwitcher from '../components/LanguageSwitcher.vue';
+import UsageDemo from '../components/UsageDemo.vue';
 import { useTheme } from '../composables/useTheme';
 
 const { init: initTheme } = useTheme();
@@ -422,12 +443,14 @@ const apiFeatures = computed(() => [
 const statsRef = ref(null);
 const featuresRef = ref(null);
 const stepsRef = ref(null);
+const demoRef = ref(null);
 const apiRef = ref(null);
 const ctaRef = ref(null);
 
 const statsVisible = ref(false);
 const featuresVisible = ref(false);
 const stepsVisible = ref(false);
+const demoVisible = ref(false);
 const apiVisible = ref(false);
 const ctaVisible = ref(false);
 
@@ -443,6 +466,7 @@ onMounted(() => {
         if (entry.target === statsRef.value) statsVisible.value = true;
         if (entry.target === featuresRef.value) featuresVisible.value = true;
         if (entry.target === stepsRef.value) stepsVisible.value = true;
+        if (entry.target === demoRef.value) demoVisible.value = true;
         if (entry.target === apiRef.value) apiVisible.value = true;
         if (entry.target === ctaRef.value) ctaVisible.value = true;
       });
@@ -450,7 +474,7 @@ onMounted(() => {
     { threshold: 0.1 }
   );
 
-  [statsRef, featuresRef, stepsRef, apiRef, ctaRef].forEach((r) => {
+  [statsRef, featuresRef, stepsRef, demoRef, apiRef, ctaRef].forEach((r) => {
     if (r.value) observer.observe(r.value);
   });
 });
@@ -481,7 +505,7 @@ onUnmounted(() => {
 }
 
 /* ── Scroll reveal: stat cards ── */
-.stat-card, .feature-card, .step-card, .api-card, .cta-card, .section-fade {
+.stat-card, .feature-card, .step-card, .api-card, .cta-card, .section-fade, .demo-fade {
   opacity: 0;
   transform: translateY(24px);
   transition: opacity 0.5s ease-out, transform 0.5s cubic-bezier(0.16,1,0.3,1);
@@ -492,6 +516,11 @@ onUnmounted(() => {
 .section-visible .section-fade {
   opacity: 1;
   transform: translateY(0);
+}
+.section-visible .demo-fade {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.12s;
 }
 .section-visible .api-card {
   opacity: 1;
