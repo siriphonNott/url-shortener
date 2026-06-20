@@ -28,7 +28,7 @@
 
         <div class="px-8 pb-8">
           <!-- Google + divider (hidden when no client id) -->
-          <template v-if="googleEnabled">
+          <template v-if="google.enabled">
             <div ref="googleBtnEl" class="flex justify-center min-h-[44px]" />
             <div class="flex items-center gap-3 my-6">
               <div class="flex-1 h-px bg-gray-200 dark:bg-slate-700/80" />
@@ -115,6 +115,7 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '../stores/auth';
 import { useTheme } from '../composables/useTheme';
+import { useGoogleSignin } from '../composables/useGoogleSignin';
 import ThemeToggle from '../components/ThemeToggle.vue';
 import LanguageSwitcher from '../components/LanguageSwitcher.vue';
 
@@ -122,6 +123,7 @@ const router = useRouter();
 const { t } = useI18n();
 const auth = useAuthStore();
 const { isDark } = useTheme();
+const google = useGoogleSignin();
 
 const email = ref('');
 const password = ref('');
@@ -134,9 +136,7 @@ const turnstileToken = ref('');
 let turnstileWidgetId = null;
 
 const googleBtnEl = ref(null);
-const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || '';
-const googleEnabled = !!googleClientId;
 
 // Load an external script once; resolve when it has loaded.
 const loaded = {};
@@ -181,11 +181,11 @@ async function handleSubmit() {
   }
 }
 
-async function handleGoogleCredential(response) {
+async function handleGoogleCredential(idToken) {
   error.value = '';
   loading.value = true;
   try {
-    await auth.googleSignin(response.credential);
+    await auth.googleSignin(idToken);
     await finishAuth();
   } catch (e) {
     error.value = e.response?.data?.message || t('auth.errorGoogle');
@@ -222,21 +222,8 @@ onMounted(async () => {
     error.value = t('auth.errorTurnstile');
   }
 
-  // Google Identity Services button (only when a client id is configured).
-  if (googleEnabled) {
-    try {
-      await loadScript('https://accounts.google.com/gsi/client');
-      window.google.accounts.id.initialize({
-        client_id: googleClientId,
-        callback: handleGoogleCredential,
-      });
-      window.google.accounts.id.renderButton(googleBtnEl.value, {
-        theme: 'outline', size: 'large', width: 320, text: 'continue_with',
-      });
-    } catch {
-      /* Google script blocked/unavailable — email + Turnstile still work. */
-    }
-  }
+  // "Continue with Google" button (no-op when no client id is configured).
+  google.renderButton(googleBtnEl.value, handleGoogleCredential);
 });
 
 // Keep the Turnstile widget's theme in sync with the app's light/dark toggle.
