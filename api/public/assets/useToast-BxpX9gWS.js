@@ -1,1 +1,0 @@
-import{h as u}from"./index-BhLzvuNZ.js";const o=u([]);let i=0;function d(){const t=(s,e="success",c=3500)=>{const r=++i;o.value.push({id:r,message:s,type:e}),setTimeout(()=>n(r),c)},n=s=>{const e=o.value.findIndex(c=>c.id===s);e!==-1&&o.value.splice(e,1)};return{toasts:o,success:s=>t(s,"success"),error:s=>t(s,"error"),info:s=>t(s,"info"),remove:n}}export{d as u};
