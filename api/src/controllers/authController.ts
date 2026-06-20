@@ -15,6 +15,33 @@ import { nowIso } from '../lib/time';
 type C = Context<AppBindings>;
 const uuid = () => crypto.randomUUID();
 
+// Default role for self-service signups: manage your own short links + personal API key.
+// RBAC is client-side; menus/actions absent here default to false on the client. Admin
+// surfaces (users/roles/api_keys) are intentionally omitted.
+const DEFAULT_ROLE_NAME = 'user';
+const DEFAULT_ROLE_PERMISSIONS = {
+  dashboard: { view: true },
+  urls: { view: true, edit: true, delete: true },
+  api_key: { view: true, edit: true },
+  docs: { view: true },
+};
+
+// Ensure the default 'user' role exists (create-or-get by its UNIQUE name) and attach it to a
+// user. Idempotent + race-safe: on a roles.name UNIQUE conflict we re-select the winner's row.
+const assignDefaultRole = async (db: ReturnType<typeof getDb>, userId: string) => {
+  let role = await db.select().from(roles).where(eq(roles.name, DEFAULT_ROLE_NAME)).get();
+  if (!role) {
+    const now = nowIso();
+    try {
+      await db.insert(roles).values({ id: uuid(), name: DEFAULT_ROLE_NAME, description: 'Standard user', permissions: JSON.stringify(DEFAULT_ROLE_PERMISSIONS), createdAt: now, updatedAt: now });
+    } catch (e: any) {
+      if (!String(e?.message || e).includes('UNIQUE constraint failed')) throw e; // lost a create race → re-select
+    }
+    role = await db.select().from(roles).where(eq(roles.name, DEFAULT_ROLE_NAME)).get();
+  }
+  if (role) await db.insert(userRoles).values({ userId, roleId: role.id });
+};
+
 export const register = async (c: C) => {
   const { email, password, turnstileToken } = (await c.req.json().catch(() => ({}))) ?? {};
   if (!email || !password) return fail(c, 'AUTH_MISSING_FIELDS');
@@ -29,6 +56,7 @@ export const register = async (c: C) => {
     if (String(e?.message || e).includes('UNIQUE constraint failed')) return fail(c, 'AUTH_EMAIL_EXISTS');
     return fail(c, 'SERVER_ERROR');
   }
+  await assignDefaultRole(db, id);
   const token = await signToken(id, c.env.JWT_SECRET);
   return ok(c, { token, user: userPayload({ id, email: String(email).toLowerCase(), fullName: '' }) }, 201);
 };
@@ -125,6 +153,7 @@ export const googleSignin = async (c: C) => {
     await db.insert(users).values({ id, email: claims.email, password: '', fullName: claims.name || '', accountType: 'free', status: 'active', googleSub: claims.sub, createdAt: now, updatedAt: now });
     u = await db.select().from(users).where(eq(users.id, id)).get();
     created = true;
+    await assignDefaultRole(db, id);
   }
 
   if (!u) return fail(c, 'SERVER_ERROR');

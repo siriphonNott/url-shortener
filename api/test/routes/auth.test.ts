@@ -156,3 +156,36 @@ describe('auth google', () => {
     expect((await res.json() as any).errorCode).toBe('AUTH_INVALID_CREDENTIALS');
   });
 });
+
+describe('auth default role (user)', () => {
+  const meRoles = async (token: string) => {
+    const me = await app.request('/api/v1/auth/me', { headers: { Authorization: `Bearer ${token}` } }, env);
+    return ((await me.json() as any).user.roles) || [];
+  };
+  it('register assigns the "user" role with link-management permissions', async () => {
+    const regd = await app.request('/api/v1/auth/register', reg({ email: 'roletest@x.com', password: 'pw123456' }), env);
+    const token = (await regd.json() as any).token;
+    const role = (await meRoles(token)).find((r: any) => r.name === 'user');
+    expect(role).toBeTruthy();
+    expect(role.permissions.dashboard?.view).toBe(true);
+    expect(role.permissions.urls).toMatchObject({ view: true, edit: true, delete: true });
+    expect(role.permissions.api_key).toMatchObject({ view: true, edit: true });
+    expect(role.permissions.docs?.view).toBe(true);
+    // No admin surfaces.
+    expect(role.permissions.users).toBeFalsy();
+    expect(role.permissions.roles).toBeFalsy();
+    expect(role.permissions.api_keys).toBeFalsy();
+  });
+  it('google-created user also gets the "user" role', async () => {
+    const tok = await signGoogle({ sub: 'role-g-sub', email: 'rolegoogle@gmail.com', email_verified: true, name: 'RG' });
+    const res = await app.request('/api/v1/auth/google', json({ idToken: tok }), env);
+    const token = (await res.json() as any).token;
+    expect((await meRoles(token)).some((r: any) => r.name === 'user')).toBe(true);
+  });
+  it('reuses a single "user" role across multiple signups', async () => {
+    await app.request('/api/v1/auth/register', reg({ email: 'r1@x.com', password: 'pw123456' }), env);
+    await app.request('/api/v1/auth/register', reg({ email: 'r2@x.com', password: 'pw123456' }), env);
+    const row = await env.DB.prepare("SELECT COUNT(*) c FROM roles WHERE name='user'").first() as any;
+    expect(row.c).toBe(1);
+  });
+});
