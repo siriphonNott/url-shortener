@@ -11,6 +11,8 @@ export default {
     management: 'Management',
     account: 'Account',
     logout: 'Logout',
+    collapseSidebar: 'Collapse sidebar',
+    expandSidebar: 'Expand sidebar',
   },
   common: {
     cancel: 'Cancel',
