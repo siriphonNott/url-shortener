@@ -110,16 +110,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '../stores/auth';
+import { useTheme } from '../composables/useTheme';
 import ThemeToggle from '../components/ThemeToggle.vue';
 import LanguageSwitcher from '../components/LanguageSwitcher.vue';
 
 const router = useRouter();
 const { t } = useI18n();
 const auth = useAuthStore();
+const { isDark } = useTheme();
 
 const email = ref('');
 const password = ref('');
@@ -192,16 +194,30 @@ async function handleGoogleCredential(response) {
   }
 }
 
+// Render Turnstile with a theme matching the APP (not the OS). Turnstile's default
+// theme:'auto' follows prefers-color-scheme, which mismatches the app's class-based
+// light/dark toggle. Re-rendered when the app theme changes (resets the token).
+function renderTurnstile() {
+  if (!window.turnstile || !turnstileEl.value) return;
+  if (turnstileWidgetId !== null) {
+    window.turnstile.remove(turnstileWidgetId);
+    turnstileWidgetId = null;
+  }
+  turnstileToken.value = '';
+  turnstileWidgetId = window.turnstile.render(turnstileEl.value, {
+    sitekey: siteKey,
+    theme: isDark.value ? 'dark' : 'light',
+    callback: (token) => { turnstileToken.value = token; },
+    'error-callback': () => { turnstileToken.value = ''; },
+    'expired-callback': () => { turnstileToken.value = ''; },
+  });
+}
+
 onMounted(async () => {
-  // Turnstile widget (explicit render).
+  // Turnstile widget (explicit render, theme synced to the app).
   try {
     await loadScript('https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit');
-    turnstileWidgetId = window.turnstile.render(turnstileEl.value, {
-      sitekey: siteKey,
-      callback: (token) => { turnstileToken.value = token; },
-      'error-callback': () => { turnstileToken.value = ''; },
-      'expired-callback': () => { turnstileToken.value = ''; },
-    });
+    renderTurnstile();
   } catch {
     error.value = t('auth.errorTurnstile');
   }
@@ -222,6 +238,9 @@ onMounted(async () => {
     }
   }
 });
+
+// Keep the Turnstile widget's theme in sync with the app's light/dark toggle.
+watch(isDark, () => renderTurnstile());
 </script>
 
 <style scoped>
