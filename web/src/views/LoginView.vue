@@ -120,6 +120,10 @@
             </button>
 
           </form>
+          <p class="text-center text-sm text-gray-500 dark:text-slate-400 mt-6">
+            {{ $t('auth.noAccount') }}
+            <router-link to="/signup" class="font-semibold text-blue-600 dark:text-blue-400 hover:underline">{{ $t('auth.signUpLink') }}</router-link>
+          </p>
         </div>
       </div>
 

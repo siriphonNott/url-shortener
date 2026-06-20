@@ -56,7 +56,7 @@
       <!-- CTAs -->
       <div class="hero-cta flex items-center gap-4 flex-wrap justify-center">
         <a
-          :href="loginUrl"
+          :href="signupUrl"
           class="shine-btn relative overflow-hidden flex items-center gap-2 bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white font-bold px-8 py-4 rounded-2xl shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 text-base"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -333,6 +333,7 @@ const { t } = useI18n();
 // Landing is served on the apex (eraflow.dev) while the app lives on a separate host;
 // send login/CTA to the app domain (VITE_APP_URL), falling back to a same-origin /login in dev.
 const loginUrl = (import.meta.env.VITE_APP_URL || '') + '/login';
+const signupUrl = (import.meta.env.VITE_APP_URL || '') + '/signup';
 
 const stats = computed(() => [
   { value: t('landing.statFastValue'), label: t('landing.statFast') },
