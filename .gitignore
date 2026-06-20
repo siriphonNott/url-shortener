@@ -7,7 +7,8 @@ web/node_modules/
 web/dist/
 web/build/
 api/dist/
-api/public/assets/
+# api/public is a generated copy of web/dist (regenerated on deploy) — never hand-edited
+api/public/
 
 # Environment variables
 .env
