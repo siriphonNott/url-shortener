@@ -2,7 +2,7 @@
   <div class="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700/60 shadow-sm overflow-hidden transition-colors duration-200">
 
     <!-- Loading -->
-    <div v-if="loading" class="p-16 flex flex-col items-center gap-3 text-gray-500 dark:text-slate-500">
+    <div v-if="loading" class="p-16 flex flex-col items-center gap-3 text-gray-600 dark:text-slate-400">
       <svg class="animate-spin w-7 h-7 text-blue-500" fill="none" viewBox="0 0 24 24">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
@@ -19,7 +19,7 @@
         </svg>
       </div>
       <p class="text-gray-800 dark:text-slate-200 font-bold text-base">ยังไม่มี Short Link</p>
-      <p class="text-sm text-gray-500 dark:text-slate-500">คลิก "สร้าง Link ใหม่" เพื่อเริ่มต้น</p>
+      <p class="text-sm text-gray-600 dark:text-slate-400">คลิก "สร้าง Link ใหม่" เพื่อเริ่มต้น</p>
     </div>
 
     <!-- Table -->
@@ -36,7 +36,7 @@
             <th class="px-5 py-3.5 text-right text-xs font-bold text-gray-700 dark:text-slate-300 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-100 dark:divide-slate-800">
+        <tbody class="divide-y divide-gray-200 dark:divide-slate-700/70">
           <tr
             v-for="(link, index) in links"
             :key="link._id"
@@ -63,7 +63,7 @@
                 <button
                   @click="copyLink(link.code)"
                   :title="copied === link.code ? 'Copied!' : 'Copy link'"
-                  class="opacity-0 group-hover:opacity-100 transition-all duration-150 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-500 dark:text-slate-500 hover:text-gray-700 dark:hover:text-slate-300"
+                  class="opacity-0 group-hover:opacity-100 transition-all duration-150 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200"
                 >
                   <svg v-if="copied !== link.code" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -102,27 +102,27 @@
             </td>
 
             <!-- Date -->
-            <td class="px-5 py-4 text-sm text-gray-500 dark:text-slate-500 font-medium">{{ formatDate(link.createdAt) }}</td>
+            <td class="px-5 py-4 text-sm text-gray-600 dark:text-slate-400 font-medium">{{ formatDate(link.createdAt) }}</td>
 
             <!-- Actions -->
             <td class="px-5 py-4">
               <div class="flex justify-end gap-1">
                 <button @click="$emit('logs', link)" title="ดู Logs"
-                  class="p-1.5 rounded-lg text-gray-500 dark:text-slate-500 hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 transition-all duration-150">
+                  class="p-1.5 rounded-lg text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 transition-all duration-150">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                   </svg>
                 </button>
                 <button @click="$emit('edit', link)" title="แก้ไข"
-                  class="p-1.5 rounded-lg text-blue-500 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all duration-150">
+                  class="p-1.5 rounded-lg text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all duration-150">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                 </button>
                 <button @click="$emit('delete', link._id)" title="ลบ"
-                  class="p-1.5 rounded-lg text-red-400 dark:text-red-500/60 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-150">
+                  class="p-1.5 rounded-lg text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-150">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

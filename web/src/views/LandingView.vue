@@ -49,7 +49,7 @@
       </h1>
 
       <!-- Subtitle -->
-      <p class="hero-sub max-w-xl text-lg text-gray-500 dark:text-slate-400 leading-relaxed mb-10">
+      <p class="hero-sub max-w-xl text-lg text-gray-600 dark:text-slate-400 leading-relaxed mb-10">
         {{ $t('landing.heroSub') }}
       </p>
 
@@ -121,7 +121,7 @@
           :style="`animation-delay: ${i * 0.08}s`"
         >
           <div class="text-3xl font-extrabold bg-gradient-to-br from-blue-600 to-violet-600 bg-clip-text text-transparent mb-1">{{ stat.value }}</div>
-          <div class="text-sm text-gray-500 dark:text-slate-400 font-medium">{{ stat.label }}</div>
+          <div class="text-sm text-gray-600 dark:text-slate-400 font-medium">{{ stat.label }}</div>
         </div>
       </div>
     </section>
@@ -155,7 +155,7 @@
               </svg>
             </div>
             <h3 class="text-base font-bold text-gray-900 dark:text-slate-100 mb-2">{{ feat.title }}</h3>
-            <p class="text-sm text-gray-500 dark:text-slate-400 leading-relaxed">{{ feat.desc }}</p>
+            <p class="text-sm text-gray-600 dark:text-slate-400 leading-relaxed">{{ feat.desc }}</p>
           </div>
         </div>
       </div>
@@ -190,7 +190,7 @@
                 </div>
               </div>
               <h3 class="text-base font-bold text-gray-900 dark:text-slate-100 mb-2">{{ step.title }}</h3>
-              <p class="text-sm text-gray-500 dark:text-slate-400 leading-relaxed max-w-xs">{{ step.desc }}</p>
+              <p class="text-sm text-gray-600 dark:text-slate-400 leading-relaxed max-w-xs">{{ step.desc }}</p>
             </div>
           </div>
         </div>
@@ -308,10 +308,10 @@
           </div>
           <span class="font-bold text-gray-700 dark:text-slate-300 text-sm">Blly.to</span>
         </div>
-        <p class="text-xs text-gray-400 dark:text-slate-600">
+        <p class="text-xs text-gray-500 dark:text-slate-500">
           {{ $t('landing.copyright') }}
         </p>
-        <a :href="loginUrl" class="text-xs text-gray-400 dark:text-slate-500 hover:text-blue-500 dark:hover:text-blue-400 transition-colors font-medium">
+        <a :href="loginUrl" class="text-xs text-gray-500 dark:text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors font-medium">
           {{ $t('landing.signIn') }}
         </a>
       </div>

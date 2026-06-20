@@ -14,9 +14,9 @@
           </svg>
         </div>
         <h3 class="text-lg font-bold text-gray-900 dark:text-slate-100">{{ $t('confirm.logoutTitle') }}</h3>
-        <p class="text-sm text-gray-500 dark:text-slate-400 mt-2 leading-relaxed">
+        <p class="text-sm text-gray-600 dark:text-slate-400 mt-2 leading-relaxed">
           {{ $t('confirm.logoutMessage') }}<br />
-          <span class="text-gray-400 dark:text-slate-500 text-xs">{{ $t('confirm.logoutHint') }}</span>
+          <span class="text-gray-500 dark:text-slate-400 text-xs">{{ $t('confirm.logoutHint') }}</span>
         </p>
       </div>
 

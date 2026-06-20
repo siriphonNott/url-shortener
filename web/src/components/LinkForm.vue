@@ -20,7 +20,7 @@
         </div>
         <button
           @click="$emit('close')"
-          class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 dark:text-slate-500 hover:text-gray-700 dark:hover:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition-all duration-150"
+          class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-800 transition-all duration-150"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -37,7 +37,7 @@
           </label>
           <div class="relative">
             <span class="absolute inset-y-0 left-3.5 flex items-center pointer-events-none">
-              <svg class="w-4 h-4 text-gray-500 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-gray-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
@@ -57,10 +57,10 @@
         <!-- Custom back-half -->
         <div>
           <label class="block text-sm font-semibold text-gray-800 dark:text-slate-200 mb-1.5">
-            {{ $t('linkForm.customCode') }} <span v-if="!link" class="text-gray-400 dark:text-slate-500 font-normal text-xs ml-1">{{ $t('linkForm.customCodeHint') }}</span>
+            {{ $t('linkForm.customCode') }} <span v-if="!link" class="text-gray-500 dark:text-slate-400 font-normal text-xs ml-1">{{ $t('linkForm.customCodeHint') }}</span>
           </label>
           <div class="flex items-center border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent transition-all duration-200 px-3.5 py-2.5 gap-0.5">
-            <span class="text-sm text-gray-400 dark:text-slate-500 select-none shrink-0">{{ shortDomain }}/</span>
+            <span class="text-sm text-gray-500 dark:text-slate-400 select-none shrink-0">{{ shortDomain }}/</span>
             <input
               v-model="form.code"
               type="text"
@@ -73,7 +73,7 @@
         <!-- Title -->
         <div>
           <label class="block text-sm font-semibold text-gray-800 dark:text-slate-200 mb-1.5">
-            {{ $t('linkForm.titleLabel') }} <span class="text-gray-400 dark:text-slate-500 font-normal text-xs ml-1">{{ $t('common.optional') }}</span>
+            {{ $t('linkForm.titleLabel') }} <span class="text-gray-500 dark:text-slate-400 font-normal text-xs ml-1">{{ $t('common.optional') }}</span>
           </label>
           <div class="relative">
             <input
@@ -98,7 +98,7 @@
         <!-- Expiry Date -->
         <div>
           <label class="block text-sm font-semibold text-gray-800 dark:text-slate-200 mb-1.5">
-            {{ $t('linkForm.expiryDate') }} <span class="text-gray-400 dark:text-slate-500 font-normal text-xs ml-1">{{ $t('linkForm.expiryHint') }}</span>
+            {{ $t('linkForm.expiryDate') }} <span class="text-gray-500 dark:text-slate-400 font-normal text-xs ml-1">{{ $t('linkForm.expiryHint') }}</span>
           </label>
           <input
             v-model="form.expiresAt"
@@ -113,7 +113,7 @@
             v-if="form.expiresAt"
             type="button"
             @click="form.expiresAt = ''"
-            class="mt-1 text-xs text-gray-400 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+            class="mt-1 text-xs text-gray-500 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition-colors"
           >
             {{ $t('linkForm.clearExpiry') }}
           </button>
@@ -123,7 +123,7 @@
         <div class="flex items-center justify-between py-1">
           <div>
             <p class="text-sm font-semibold text-gray-800 dark:text-slate-200">{{ $t('linkForm.linkStatus') }}</p>
-            <p class="text-xs text-gray-500 dark:text-slate-500 mt-0.5">
+            <p class="text-xs text-gray-600 dark:text-slate-400 mt-0.5">
               {{ form.isActive ? $t('linkForm.linkActive') : $t('linkForm.linkInactive') }}
             </p>
           </div>

@@ -5,7 +5,7 @@
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-bold text-gray-900 dark:text-slate-100">{{ $t('roles.title') }}</h1>
-        <p class="mt-1 text-sm text-gray-500 dark:text-slate-500">{{ $t('roles.total', { n: store.roles.length }) }}</p>
+        <p class="mt-1 text-sm text-gray-600 dark:text-slate-400">{{ $t('roles.total', { n: store.roles.length }) }}</p>
       </div>
       <button
         @click="openModal()"
@@ -29,12 +29,12 @@
     <!-- Empty -->
     <div v-else-if="!store.roles.length"
       class="bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-gray-300 dark:border-slate-600 p-12 text-center">
-      <svg class="w-10 h-10 text-gray-300 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="w-10 h-10 text-gray-400 dark:text-slate-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
           d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
       </svg>
-      <p class="text-sm text-gray-500 dark:text-slate-400 font-medium">{{ $t('roles.noRoles') }}</p>
-      <p class="text-xs text-gray-400 dark:text-slate-500 mt-1">{{ $t('roles.noRolesHint') }}</p>
+      <p class="text-sm text-gray-600 dark:text-slate-400 font-medium">{{ $t('roles.noRoles') }}</p>
+      <p class="text-xs text-gray-500 dark:text-slate-400 mt-1">{{ $t('roles.noRolesHint') }}</p>
     </div>
 
     <!-- Role cards -->
@@ -45,7 +45,7 @@
         class="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700/60 shadow-sm overflow-hidden"
       >
         <!-- Role header -->
-        <div class="flex items-start justify-between px-6 py-4 border-b border-gray-100 dark:border-slate-700/60">
+        <div class="flex items-start justify-between px-6 py-4 border-b border-gray-200 dark:border-slate-700/60">
           <div class="flex items-center gap-3">
             <div class="w-9 h-9 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center shrink-0">
               <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -55,13 +55,13 @@
             </div>
             <div>
               <p class="font-bold text-gray-900 dark:text-slate-100">{{ role.name }}</p>
-              <p class="text-xs text-gray-500 dark:text-slate-500 mt-0.5">{{ role.description || $t('roles.noDescription') }} · {{ $t('roles.userCount', { n: role.userCount || 0 }) }}</p>
+              <p class="text-xs text-gray-600 dark:text-slate-400 mt-0.5">{{ role.description || $t('roles.noDescription') }} · {{ $t('roles.userCount', { n: role.userCount || 0 }) }}</p>
             </div>
           </div>
           <div class="flex items-center gap-2">
             <button
               @click="openModal(role)"
-              class="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+              class="p-1.5 rounded-lg text-gray-500 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -70,7 +70,7 @@
             </button>
             <button
               @click="deleteTarget = role"
-              class="p-1.5 rounded-lg text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+              class="p-1.5 rounded-lg text-gray-500 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -85,14 +85,14 @@
           <table class="w-full text-xs">
             <thead>
               <tr>
-                <th class="text-left text-gray-400 dark:text-slate-500 font-semibold uppercase tracking-wider pb-2 pr-4 w-32 whitespace-nowrap">{{ $t('roles.menu') }}</th>
+                <th class="text-left text-gray-500 dark:text-slate-400 font-semibold uppercase tracking-wider pb-2 pr-4 w-32 whitespace-nowrap">{{ $t('roles.menu') }}</th>
                 <th v-for="action in ACTIONS" :key="action.key"
-                  class="text-center text-gray-400 dark:text-slate-500 font-semibold uppercase tracking-wider pb-2 px-3 w-16 whitespace-nowrap">
+                  class="text-center text-gray-500 dark:text-slate-400 font-semibold uppercase tracking-wider pb-2 px-3 w-16 whitespace-nowrap">
                   {{ action.label }}
                 </th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-50 dark:divide-slate-800">
+            <tbody class="divide-y divide-gray-200 dark:divide-slate-700/70">
               <tr v-for="menu in MENUS" :key="menu.key">
                 <td class="py-2 pr-4 text-gray-600 dark:text-slate-400 font-medium">{{ menu.label }}</td>
                 <td v-for="action in ACTIONS" :key="action.key" class="py-2 px-3 text-center">
@@ -103,7 +103,7 @@
                     </svg>
                   </span>
                   <span v-else class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 dark:bg-slate-800">
-                    <svg class="w-3 h-3 text-gray-300 dark:text-slate-600" fill="currentColor" viewBox="0 0 20 20">
+                    <svg class="w-3 h-3 text-gray-400 dark:text-slate-500" fill="currentColor" viewBox="0 0 20 20">
                       <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>
                   </span>
@@ -124,9 +124,9 @@
             <div v-if="showModal" class="w-full max-w-lg bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-slate-700">
 
               <!-- Modal header -->
-              <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-slate-700">
+              <div class="flex items-center justify-between px-6 py-5 border-b border-gray-200 dark:border-slate-700">
                 <h3 class="text-base font-bold text-gray-900 dark:text-slate-100">{{ editTarget ? $t('roles.editTitle') : $t('roles.addTitle') }}</h3>
-                <button @click="showModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 transition-colors">
+                <button @click="showModal = false" class="text-gray-500 hover:text-gray-700 dark:hover:text-slate-200 transition-colors">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                   </svg>
@@ -155,9 +155,9 @@
                     <div class="flex gap-2">
                       <button type="button" @click="selectAll(true)"
                         class="text-xs text-blue-600 dark:text-blue-400 hover:underline">{{ $t('roles.selectAll') }}</button>
-                      <span class="text-gray-300 dark:text-slate-600">·</span>
+                      <span class="text-gray-400 dark:text-slate-500">·</span>
                       <button type="button" @click="selectAll(false)"
-                        class="text-xs text-gray-500 dark:text-slate-400 hover:underline">{{ $t('roles.clearAll') }}</button>
+                        class="text-xs text-gray-600 dark:text-slate-400 hover:underline">{{ $t('roles.clearAll') }}</button>
                     </div>
                   </div>
 
@@ -165,7 +165,7 @@
                     <table class="w-full text-sm">
                       <thead>
                         <tr class="bg-gray-50 dark:bg-slate-800/60 border-b border-gray-200 dark:border-slate-700">
-                          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">{{ $t('roles.menu') }}</th>
+                          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-slate-300 uppercase tracking-wider whitespace-nowrap">{{ $t('roles.menu') }}</th>
                           <th v-for="action in ACTIONS" :key="action.key" class="px-4 py-3 text-center whitespace-nowrap">
                             <div class="flex flex-col items-center gap-1.5">
                               <label class="inline-flex items-center justify-center cursor-pointer" :title="`Toggle all ${action.label}`">
@@ -182,19 +182,19 @@
                                 </div>
                               </label>
                               <span class="text-xs font-semibold uppercase tracking-wider"
-                                :class="allActionChecked(action.key) ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-slate-500'">
+                                :class="allActionChecked(action.key) ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-slate-400'">
                                 {{ action.label }}
                               </span>
                             </div>
                           </th>
                         </tr>
                       </thead>
-                      <tbody class="divide-y divide-gray-100 dark:divide-slate-700/60">
+                      <tbody class="divide-y divide-gray-200 dark:divide-slate-700/60">
                         <tr v-for="menu in MENUS" :key="menu.key"
                           class="hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-colors">
                           <td class="px-4 py-3">
                             <div class="flex items-center gap-2">
-                              <svg class="w-4 h-4 text-gray-400 dark:text-slate-500 shrink-0"
+                              <svg class="w-4 h-4 text-gray-500 dark:text-slate-400 shrink-0"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="menu.d" />
                               </svg>
@@ -268,7 +268,7 @@
             </div>
             <div class="text-center">
               <h3 class="text-base font-bold text-gray-900 dark:text-slate-100">{{ $t('roles.deleteTitle') }}</h3>
-              <p class="mt-1 text-sm text-gray-500 dark:text-slate-400">
+              <p class="mt-1 text-sm text-gray-600 dark:text-slate-400">
                 {{ $t('roles.deleteConfirm', { name: deleteTarget?.name }) }}
               </p>
             </div>
