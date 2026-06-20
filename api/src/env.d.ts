@@ -4,6 +4,7 @@ export type Env = {
   JWT_SECRET: string;
   BASE_SHORT_URL: string;
   TURNSTILE_SECRET_KEY: string;
+  GOOGLE_CLIENT_ID: string;
 };
 
 export type AuthUser = { id: string; email?: string; fullName?: string; iat?: number; exp?: number };

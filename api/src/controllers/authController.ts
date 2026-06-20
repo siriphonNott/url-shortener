@@ -5,6 +5,7 @@ import { getDb } from '../db/client';
 import { users, roles, userRoles, apiKeys } from '../db/schema';
 import { ok, fail } from '../lib/errorCodes';
 import { verifyTurnstile } from '../lib/turnstile';
+import { verifyGoogleIdToken } from '../lib/google';
 import { hashPassword, verifyPassword } from '../lib/password';
 import { signToken } from '../lib/jwt';
 import { generateKey } from '../lib/keys';
@@ -90,4 +91,46 @@ export const regenerateApiKey = async (c: C) => {
   const id = uuid(); const now = nowIso();
   await db.insert(apiKeys).values({ id, userId, keyName: 'Personal', keyHash, keyPrefix, scopes: JSON.stringify({ links: 'write', stats: 'read' }), status: 'active', isPersonal: 1, expiresAt: null, lastUsedAt: null, createdAt: now, updatedAt: now });
   return ok(c, { keyId: id, apiKey: fullKey, keyPrefix, apiKeyStatus: 'active', apiKeyExpiresAt: null });
+};
+
+export const googleSignin = async (c: C) => {
+  const { idToken } = (await c.req.json().catch(() => ({}))) ?? {};
+  if (!idToken) return fail(c, 'AUTH_GOOGLE_INVALID');
+  let claims;
+  try {
+    claims = await verifyGoogleIdToken(idToken, c.env.GOOGLE_CLIENT_ID);
+  } catch {
+    return fail(c, 'AUTH_GOOGLE_INVALID');
+  }
+  const db = getDb(c.env);
+  let created = false;
+
+  // 1) Existing Google account (matched by sub).
+  let u = await db.select().from(users).where(eq(users.googleSub, claims.sub)).get();
+
+  // 2) Otherwise link onto an existing password account with the same email.
+  if (!u) {
+    const byEmail = await db.select().from(users).where(eq(users.email, claims.email)).get();
+    if (byEmail) {
+      await db.update(users)
+        .set({ googleSub: claims.sub, fullName: byEmail.fullName || claims.name, updatedAt: nowIso() })
+        .where(eq(users.id, byEmail.id));
+      u = await db.select().from(users).where(eq(users.id, byEmail.id)).get();
+    }
+  }
+
+  // 3) Otherwise create a new Google-only account (empty-string password sentinel).
+  if (!u) {
+    const id = uuid(); const now = nowIso();
+    await db.insert(users).values({ id, email: claims.email, password: '', fullName: claims.name || '', accountType: 'free', status: 'active', googleSub: claims.sub, createdAt: now, updatedAt: now });
+    u = await db.select().from(users).where(eq(users.id, id)).get();
+    created = true;
+  }
+
+  if (u!.status === 'inactive') return fail(c, 'AUTH_ACCOUNT_INACTIVE');
+  if (u!.status === 'suspended') return fail(c, 'AUTH_ACCOUNT_SUSPENDED');
+  if (u!.status === 'pending_verification') return fail(c, 'AUTH_ACCOUNT_PENDING');
+
+  const token = await signToken(u!.id, c.env.JWT_SECRET);
+  return ok(c, { token, user: userPayload(u) }, created ? 201 : 200);
 };

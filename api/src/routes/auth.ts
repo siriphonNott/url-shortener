@@ -6,6 +6,7 @@ import * as ctrl from '../controllers/authController';
 export const authRoutes = new Hono<AppBindings>();
 authRoutes.post('/register', ctrl.register);
 authRoutes.post('/login', ctrl.login);
+authRoutes.post('/google', ctrl.googleSignin);
 authRoutes.get('/me', auth, ctrl.me);
 authRoutes.put('/profile', auth, ctrl.updateProfile);
 authRoutes.put('/change-password', auth, ctrl.changePassword);

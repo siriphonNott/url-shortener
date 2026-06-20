@@ -18,6 +18,7 @@ export const ERRORS = {
   AUTH_ACCOUNT_SUSPENDED: { code: 'AUTH_ACCOUNT_SUSPENDED', message: 'Your account has been suspended', status: 403 },
   AUTH_ACCOUNT_PENDING: { code: 'AUTH_ACCOUNT_PENDING', message: 'Your account is pending verification', status: 403 },
   AUTH_TURNSTILE_FAILED: { code: 'AUTH_TURNSTILE_FAILED', message: 'Human verification failed, please try again', status: 400 },
+  AUTH_GOOGLE_INVALID: { code: 'AUTH_GOOGLE_INVALID', message: 'Google sign-in failed, please try again', status: 401 },
   FORBIDDEN: { code: 'FORBIDDEN', message: 'You do not have permission to perform this action', status: 403 },
   USER_NOT_FOUND: { code: 'USER_NOT_FOUND', message: 'User not found', status: 404 },
   ROLE_NOT_FOUND: { code: 'ROLE_NOT_FOUND', message: 'Role not found', status: 404 },
