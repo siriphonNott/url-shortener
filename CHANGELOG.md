@@ -5,6 +5,18 @@ All notable changes to this project are documented here. Format based on
 [Semantic Versioning](https://semver.org/). The version tracks the **root `package.json`**
 as the single project version — `api/` and `web/` `package.json` versions are independent build versions.
 
+## [1.3.1] - 2026-06-21
+
+### Changed
+- **Landing CTA ("Ready to get started?") redesigned to be crisp and on-brand** (`web/src/views/LandingView.vue`):
+  removed the hazy blur layers (the animated glow halo, the blurred top spotlight, the soft wash overlay, and the
+  icon `backdrop-blur`) and rebuilt definition with hard-edged geometry — a hairline inner ring, a lit-from-above
+  1px bevel, a single crisp top-edge highlight line, and a tight low-spread directional shadow (with a dark-mode
+  shadow override so it seats on `slate-950`). Keeps the brand `blue-600 → violet-600` gradient, masked dot-grid
+  texture, floating icon, and `.shine-btn` button; all motion is gated behind `prefers-reduced-motion`.
+- **Footer version chip restyled** to match the hero badge: a blue brand pill (`v{x.y.z}`) instead of the gray chip.
+- **Removed the leading dot** from the hero "URL Shortener & Analytics Platform" badge and the footer version chip.
+
 ## [1.3.0] - 2026-06-21
 
 ### Added

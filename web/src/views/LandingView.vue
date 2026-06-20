@@ -45,12 +45,11 @@
 
       <!-- Badge -->
       <div class="badge-enter inline-flex items-center gap-2 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-bold px-4 py-1.5 rounded-full mb-8 uppercase tracking-wider">
-        <span class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
         {{ $t('landing.badge') }}
       </div>
 
       <!-- Headline -->
-      <h1 class="hero-title max-w-3xl text-5xl lg:text-6xl font-extrabold text-gray-900 dark:text-white leading-tight tracking-tight mb-6">
+      <h1 class="hero-title max-w-6xl text-5xl lg:text-6xl font-extrabold text-gray-900 dark:text-white leading-tight tracking-tight mb-6">
         {{ $t('landing.heroTitle') }}
         <span class="bg-gradient-to-r from-blue-600 via-violet-600 to-blue-500 bg-clip-text text-transparent">{{ $t('landing.heroGradient') }}</span>
         <br />{{ $t('landing.heroEnd') }}
@@ -293,32 +292,37 @@
     <!-- ─── CTA ─── -->
     <section class="relative z-10 px-6 lg:px-12 pb-24" ref="ctaRef">
       <div class="max-w-3xl mx-auto text-center" :class="{ 'section-visible': ctaVisible }">
-        <div class="cta-card bg-gradient-to-br from-blue-600 via-blue-500 to-violet-600 rounded-3xl p-12 lg:p-16 shadow-2xl shadow-blue-500/30 overflow-hidden relative">
-          <!-- Glow overlay -->
-          <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
-          <div class="absolute top-0 right-0 w-64 h-64 bg-violet-400/20 rounded-full blur-3xl" />
-          <div class="relative z-10">
-            <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-              </svg>
+        <div class="cta-card relative">
+          <div class="cta-surface relative overflow-hidden rounded-3xl p-12 lg:p-16 bg-gradient-to-br from-blue-600 via-blue-500 to-violet-600">
+            <!-- Crisp 1px top-edge highlight (replaces the soft wash + blurred spotlight) -->
+            <div class="cta-toplight pointer-events-none absolute inset-x-0 top-0 h-px" aria-hidden="true" />
+            <!-- Masked dot grid texture -->
+            <div class="cta-dots pointer-events-none absolute inset-0" />
+
+            <div class="relative z-10">
+              <!-- Floating icon tile -->
+              <div class="cta-float w-16 h-16 mx-auto mb-6 rounded-2xl flex items-center justify-center bg-white/20 border border-white/25 shadow-lg shadow-blue-900/20">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+              </div>
+              <h2 class="text-3xl lg:text-4xl font-extrabold text-white mb-4 leading-tight">
+                {{ $t('landing.ctaTitle') }}
+              </h2>
+              <p class="text-blue-50/90 mb-8 max-w-md mx-auto leading-relaxed">
+                {{ $t('landing.ctaSub') }}
+              </p>
+              <a
+                :href="signupUrl"
+                class="shine-btn group relative inline-flex items-center gap-2 overflow-hidden bg-white text-blue-600 font-extrabold px-8 py-4 rounded-2xl shadow-lg hover:shadow-2xl hover:shadow-white/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 text-base"
+              >
+                <span class="relative z-10">{{ $t('landing.ctaBtn') }}</span>
+                <svg class="relative z-10 w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
             </div>
-            <h2 class="text-3xl lg:text-4xl font-extrabold text-white mb-4 leading-tight">
-              {{ $t('landing.ctaTitle') }}
-            </h2>
-            <p class="text-blue-100 mb-8 max-w-md mx-auto leading-relaxed">
-              {{ $t('landing.ctaSub') }}
-            </p>
-            <a
-              :href="signupUrl"
-              class="inline-flex items-center gap-2 bg-white text-blue-600 font-extrabold px-8 py-4 rounded-2xl hover:bg-blue-50 transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 text-base"
-            >
-              {{ $t('landing.ctaBtn') }}
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
-              </svg>
-            </a>
           </div>
         </div>
       </div>
@@ -335,7 +339,7 @@
             </svg>
           </div>
           <span class="font-bold text-gray-700 dark:text-slate-300 text-sm">Blly.to</span>
-          <span class="text-[11px] font-mono font-semibold text-gray-400 dark:text-slate-500 bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-full px-2 py-0.5">v{{ appVersion }}</span>
+          <span class="inline-flex items-center text-[11px] font-mono font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-full px-2.5 py-0.5 tracking-wider">v{{ appVersion }}</span>
         </div>
         <p class="text-xs text-gray-500 dark:text-slate-500">
           {{ $t('landing.copyright') }}
@@ -555,5 +559,52 @@ onUnmounted(() => {
 @keyframes blobFloat {
   0%, 100% { transform: translate(var(--tw-translate-x), var(--tw-translate-y)) scale(1); }
   50%       { transform: translate(var(--tw-translate-x), var(--tw-translate-y)) scale(1.07); }
+}
+
+/* ── CTA: flat & defined (crisp edges, no blur haze) ── */
+/* Presence comes from hard-edged geometry, not blur: a hairline inner ring,
+   a lit top / seated bottom inset bevel, and a tight low-spread drop shadow. */
+.cta-surface {
+  box-shadow:
+    inset 0 1px 0 0 rgba(255,255,255,0.28),   /* crisp top-edge highlight */
+    inset 0 0 0 1px rgba(255,255,255,0.22),    /* hairline inner ring */
+    inset 0 -1px 0 0 rgba(0,0,0,0.12),         /* subtle bottom edge to seat it */
+    0 10px 24px -8px rgba(37,99,235,0.45),     /* tight directional shadow (blue-600) */
+    0 2px 6px -2px rgba(17,24,39,0.18);        /* close contact shadow */
+}
+.dark .cta-surface {
+  box-shadow:
+    inset 0 1px 0 0 rgba(255,255,255,0.22),
+    inset 0 0 0 1px rgba(255,255,255,0.16),
+    inset 0 -1px 0 0 rgba(0,0,0,0.22),
+    0 12px 28px -10px rgba(0,0,0,0.65),
+    0 2px 6px -2px rgba(0,0,0,0.5);
+}
+
+/* Single defined 1px top highlight line — crisp edge light, fades at the corners. */
+.cta-toplight {
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,255,255,0.55) 18%,
+    rgba(255,255,255,0.65) 50%,
+    rgba(255,255,255,0.55) 82%,
+    transparent 100%);
+}
+
+.cta-dots {
+  background-image: radial-gradient(rgba(255,255,255,0.18) 1px, transparent 1.5px);
+  background-size: 20px 20px;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 35%, transparent 78%);
+          mask-image: radial-gradient(ellipse at center, #000 35%, transparent 78%);
+}
+
+.cta-float { animation: ctaFloat 4.5s ease-in-out infinite; }
+@keyframes ctaFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-7px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta-float { animation: none; }
 }
 </style>
