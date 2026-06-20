@@ -6,6 +6,9 @@
   // Static Assets: serve ./public on the apex host. NO not_found_handling — the default
   // returns 404 for unmatched paths, which index.ts treats as a short-code redirect.
   // Do NOT set "single-page-application" here: it would 200 every path and shadow /:code.
+  // NB: the DEPLOYED edge invokes the Worker on an asset-miss (so /:code redirects work in
+  // prod), but local `wrangler dev` does NOT — it 404s in the asset layer. `run_worker_first`
+  // does not help (it breaks env.ASSETS.fetch locally). Test redirects via vitest, not dev.
   "assets": { "directory": "./public", "binding": "ASSETS" },
   "d1_databases": [
     { "binding": "DB", "database_name": "blly-db", "database_id": "2bad526c-f4af-45f3-ae61-dfacada1cf90", "migrations_dir": "drizzle" }
