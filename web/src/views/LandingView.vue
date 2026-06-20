@@ -124,9 +124,14 @@
         :class="{ 'section-visible': statsVisible }"
       >
         <div v-for="(stat, i) in stats" :key="i"
-          class="stat-card bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border border-gray-200 dark:border-slate-700/60 rounded-2xl p-5 text-center shadow-sm"
+          class="stat-card group bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border border-gray-200 dark:border-slate-700/60 rounded-2xl p-5 text-center shadow-sm hover:shadow-xl hover:shadow-blue-500/10 dark:hover:shadow-blue-500/5 hover:-translate-y-1 transition-all duration-300"
           :style="`animation-delay: ${i * 0.08}s`"
         >
+          <div :class="`w-11 h-11 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg ${stat.iconShadow} ${stat.iconBg} transition-transform duration-300 group-hover:scale-110`">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="stat.iconD" />
+            </svg>
+          </div>
           <div class="text-3xl font-extrabold bg-gradient-to-br from-blue-600 to-violet-600 bg-clip-text text-transparent mb-1">{{ stat.value }}</div>
           <div class="text-sm text-gray-600 dark:text-slate-400 font-medium">{{ stat.label }}</div>
         </div>
@@ -373,10 +378,34 @@ const signupUrl = (import.meta.env.VITE_APP_URL || '') + '/signup';
 const appVersion = import.meta.env.VITE_APP_VERSION;
 
 const stats = computed(() => [
-  { value: t('landing.statFastValue'), label: t('landing.statFast') },
-  { value: t('landing.statCustomValue'), label: t('landing.statCustomLabel') },
-  { value: t('landing.statAnalyticsValue'), label: t('landing.statAnalyticsLabel') },
-  { value: t('landing.statApiValue'), label: t('landing.statApiLabel') },
+  {
+    value: t('landing.statFastValue'),
+    label: t('landing.statFast'),
+    iconBg: 'bg-gradient-to-br from-blue-500 to-indigo-600',
+    iconShadow: 'shadow-blue-500/30',
+    iconD: 'M13 10V3L4 14h7v7l9-11h-7z',
+  },
+  {
+    value: t('landing.statCustomValue'),
+    label: t('landing.statCustomLabel'),
+    iconBg: 'bg-gradient-to-br from-indigo-500 to-violet-600',
+    iconShadow: 'shadow-indigo-500/30',
+    iconD: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z',
+  },
+  {
+    value: t('landing.statAnalyticsValue'),
+    label: t('landing.statAnalyticsLabel'),
+    iconBg: 'bg-gradient-to-br from-violet-500 to-fuchsia-600',
+    iconShadow: 'shadow-violet-500/30',
+    iconD: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6',
+  },
+  {
+    value: t('landing.statApiValue'),
+    label: t('landing.statApiLabel'),
+    iconBg: 'bg-gradient-to-br from-fuchsia-500 to-pink-600',
+    iconShadow: 'shadow-fuchsia-500/30',
+    iconD: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4',
+  },
 ]);
 
 const features = computed(() => [

@@ -5,6 +5,16 @@ All notable changes to this project are documented here. Format based on
 [Semantic Versioning](https://semver.org/). The version tracks the **root `package.json`**
 as the single project version — `api/` and `web/` `package.json` versions are independent build versions.
 
+## [1.3.2] - 2026-06-21
+
+### Added
+- **Icons on the landing "Stats Bar" cards** (`web/src/views/LandingView.vue`): each of the four cards
+  (Fast / Custom / Analytics / REST API) now leads with a gradient icon chip, reusing the existing Features-section
+  icon idiom (`iconBg` + outline SVG `iconD`). Icons: lightning (Fast), cogwheel (Custom), trend line (Analytics),
+  code `</>` (REST API). Chip gradients run blue → indigo → violet → fuchsia → pink to extend the brand gradient,
+  each with a soft colored glow and a hover lift + icon-scale matching the feature cards. Theme-aware (white glyph
+  on gradient), no new dependencies or i18n keys.
+
 ## [1.3.1] - 2026-06-21
 
 ### Changed
