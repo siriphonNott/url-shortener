@@ -56,7 +56,14 @@ export const register = async (c: C) => {
     if (String(e?.message || e).includes('UNIQUE constraint failed')) return fail(c, 'AUTH_EMAIL_EXISTS');
     return fail(c, 'SERVER_ERROR');
   }
-  await assignDefaultRole(db, id);
+  try {
+    await assignDefaultRole(db, id);
+  } catch {
+    // Roll back the just-created user so a roleless orphan isn't left behind — that would
+    // block retry (AUTH_EMAIL_EXISTS) and be unusable. Keeps signup effectively atomic.
+    await db.delete(users).where(eq(users.id, id)).catch(() => {});
+    return fail(c, 'SERVER_ERROR');
+  }
   const token = await signToken(id, c.env.JWT_SECRET);
   return ok(c, { token, user: userPayload({ id, email: String(email).toLowerCase(), fullName: '' }) }, 201);
 };
@@ -151,9 +158,15 @@ export const googleSignin = async (c: C) => {
   if (!u) {
     const id = uuid(); const now = nowIso();
     await db.insert(users).values({ id, email: claims.email, password: '', fullName: claims.name || '', accountType: 'free', status: 'active', googleSub: claims.sub, createdAt: now, updatedAt: now });
+    try {
+      await assignDefaultRole(db, id);
+    } catch {
+      // Roll back the new account so a roleless orphan isn't left behind (keeps retry clean).
+      await db.delete(users).where(eq(users.id, id)).catch(() => {});
+      return fail(c, 'SERVER_ERROR');
+    }
     u = await db.select().from(users).where(eq(users.id, id)).get();
     created = true;
-    await assignDefaultRole(db, id);
   }
 
   if (!u) return fail(c, 'SERVER_ERROR');
