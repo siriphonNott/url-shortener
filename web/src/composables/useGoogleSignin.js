@@ -23,9 +23,12 @@ export function useGoogleSignin() {
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
   const enabled = !!clientId;
 
-  // Render the GIS button into `el`. `onCredential(idToken)` receives the Google ID token.
+  // Render (or re-render) the GIS button into `el`. `onCredential(idToken)` receives the
+  // Google ID token. Pass `{ dark }` to match the app's light/dark theme — GIS can't restyle
+  // an already-rendered button, so we clear `el` and redraw; call this again from a watch on
+  // the app theme to switch (light → 'outline' white button, dark → 'filled_black').
   // No-ops (and never throws) when disabled, the element is missing, or GIS fails to load.
-  async function renderButton(el, onCredential) {
+  async function renderButton(el, onCredential, { dark = false } = {}) {
     if (!enabled || !el) return;
     try {
       await loadGis();
@@ -33,8 +36,10 @@ export function useGoogleSignin() {
         client_id: clientId,
         callback: (response) => onCredential(response.credential),
       });
+      el.innerHTML = '';
       window.google.accounts.id.renderButton(el, {
-        theme: 'outline', size: 'large', width: 320, text: 'continue_with',
+        theme: dark ? 'filled_black' : 'outline',
+        size: 'large', width: 320, text: 'continue_with',
       });
     } catch {
       /* GIS blocked/unavailable — email/password flows still work. */

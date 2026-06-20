@@ -223,11 +223,15 @@ onMounted(async () => {
   }
 
   // "Continue with Google" button (no-op when no client id is configured).
-  google.renderButton(googleBtnEl.value, handleGoogleCredential);
+  renderGoogle();
 });
 
-// Keep the Turnstile widget's theme in sync with the app's light/dark toggle.
-watch(isDark, () => renderTurnstile());
+function renderGoogle() {
+  google.renderButton(googleBtnEl.value, handleGoogleCredential, { dark: isDark.value });
+}
+
+// Keep the Turnstile widget and Google button themes in sync with the app's light/dark toggle.
+watch(isDark, () => { renderTurnstile(); renderGoogle(); });
 </script>
 
 <style scoped>

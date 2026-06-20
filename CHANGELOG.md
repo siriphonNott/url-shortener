@@ -5,6 +5,17 @@ All notable changes to this project are documented here. Format based on
 [Semantic Versioning](https://semver.org/). The version tracks the **root `package.json`**
 as the single project version — `api/` and `web/` `package.json` versions are independent build versions.
 
+## [1.3.4] - 2026-06-21
+
+### Fixed
+- **"Continue with Google" button now follows the app's light/dark theme** (`web/src/composables/useGoogleSignin.js`,
+  `web/src/views/LoginView.vue`, `web/src/views/SignupView.vue`). The Google Identity Services button was hardcoded to
+  `theme: 'outline'` (a white button), so it stayed light even on the dark login/signup pages while everything else —
+  including the Turnstile widget — already adapted. `renderButton` now takes a `{ dark }` option (light → `outline`,
+  dark → `filled_black`) and clears its container before redrawing, since GIS can't restyle an already-rendered button.
+  Both views pass the current theme and re-render the button on the light/dark toggle, mirroring the existing Turnstile
+  re-render pattern. No new dependencies.
+
 ## [1.3.3] - 2026-06-21
 
 ### Added

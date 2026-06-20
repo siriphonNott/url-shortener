@@ -147,10 +147,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '../stores/auth';
+import { useTheme } from '../composables/useTheme';
 import { useGoogleSignin } from '../composables/useGoogleSignin';
 import ThemeToggle from '../components/ThemeToggle.vue';
 import LanguageSwitcher from '../components/LanguageSwitcher.vue';
@@ -158,6 +159,7 @@ import LanguageSwitcher from '../components/LanguageSwitcher.vue';
 const router = useRouter();
 const { t } = useI18n();
 const auth = useAuthStore();
+const { isDark } = useTheme();
 const google = useGoogleSignin();
 
 const email = ref('');
@@ -195,9 +197,14 @@ async function handleGoogleCredential(idToken) {
   }
 }
 
-onMounted(() => {
-  google.renderButton(googleBtnEl.value, handleGoogleCredential);
-});
+function renderGoogle() {
+  google.renderButton(googleBtnEl.value, handleGoogleCredential, { dark: isDark.value });
+}
+
+onMounted(renderGoogle);
+
+// Keep the Google button's theme in sync with the app's light/dark toggle.
+watch(isDark, renderGoogle);
 </script>
 
 <style scoped>
