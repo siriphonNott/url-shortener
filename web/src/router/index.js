@@ -13,6 +13,11 @@ const routes = [
     component: () => import('../views/LoginView.vue'),
     meta: { guest: true },
   },
+  {
+    path: '/signup',
+    component: () => import('../views/SignupView.vue'),
+    meta: { guest: true },
+  },
   // App layout — children define their own absolute-style paths via named routes
   {
     path: '/',

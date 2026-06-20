@@ -36,6 +36,17 @@
 
         <!-- Form -->
         <div class="form-enter px-8 py-7">
+
+          <!-- Continue with Google (hidden when no client id configured) -->
+          <template v-if="google.enabled">
+            <div ref="googleBtnEl" class="flex justify-center min-h-[44px]" />
+            <div class="flex items-center gap-3 my-6">
+              <div class="flex-1 h-px bg-gray-200 dark:bg-slate-700/80" />
+              <span class="text-xs uppercase tracking-wide text-gray-400 dark:text-slate-500">{{ $t('auth.orDivider') }}</span>
+              <div class="flex-1 h-px bg-gray-200 dark:bg-slate-700/80" />
+            </div>
+          </template>
+
           <form @submit.prevent="handleSubmit" class="space-y-5">
 
             <!-- Email -->
@@ -120,6 +131,10 @@
             </button>
 
           </form>
+          <p class="text-center text-sm text-gray-500 dark:text-slate-400 mt-6">
+            {{ $t('auth.noAccount') }}
+            <router-link to="/signup" class="font-semibold text-blue-600 dark:text-blue-400 hover:underline">{{ $t('auth.signUpLink') }}</router-link>
+          </p>
         </div>
       </div>
 
@@ -132,22 +147,25 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '../stores/auth';
+import { useGoogleSignin } from '../composables/useGoogleSignin';
 import ThemeToggle from '../components/ThemeToggle.vue';
 import LanguageSwitcher from '../components/LanguageSwitcher.vue';
 
 const router = useRouter();
 const { t } = useI18n();
 const auth = useAuthStore();
+const google = useGoogleSignin();
 
 const email = ref('');
 const password = ref('');
 const error = ref('');
 const loading = ref(false);
 const showPassword = ref(false);
+const googleBtnEl = ref(null);
 
 const handleSubmit = async () => {
   error.value = '';
@@ -162,6 +180,24 @@ const handleSubmit = async () => {
     loading.value = false;
   }
 };
+
+async function handleGoogleCredential(idToken) {
+  error.value = '';
+  loading.value = true;
+  try {
+    await auth.googleSignin(idToken);
+    await auth.fetchMe();
+    router.push('/dashboard');
+  } catch (e) {
+    error.value = e.response?.data?.message || t('auth.errorGoogle');
+  } finally {
+    loading.value = false;
+  }
+}
+
+onMounted(() => {
+  google.renderButton(googleBtnEl.value, handleGoogleCredential);
+});
 </script>
 
 <style scoped>

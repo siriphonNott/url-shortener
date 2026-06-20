@@ -4,6 +4,8 @@ import type { AppBindings } from '../env';
 import { getDb } from '../db/client';
 import { users, roles, userRoles, apiKeys } from '../db/schema';
 import { ok, fail } from '../lib/errorCodes';
+import { verifyTurnstile } from '../lib/turnstile';
+import { verifyGoogleIdToken } from '../lib/google';
 import { hashPassword, verifyPassword } from '../lib/password';
 import { signToken } from '../lib/jwt';
 import { generateKey } from '../lib/keys';
@@ -13,15 +15,53 @@ import { nowIso } from '../lib/time';
 type C = Context<AppBindings>;
 const uuid = () => crypto.randomUUID();
 
+// Default role for self-service signups: manage your own short links + personal API key.
+// RBAC is client-side; menus/actions absent here default to false on the client. Admin
+// surfaces (users/roles/api_keys) are intentionally omitted.
+const DEFAULT_ROLE_NAME = 'user';
+const DEFAULT_ROLE_PERMISSIONS = {
+  dashboard: { view: true },
+  urls: { view: true, edit: true, delete: true },
+  api_key: { view: true, edit: true },
+  docs: { view: true },
+};
+
+// Ensure the default 'user' role exists (create-or-get by its UNIQUE name) and attach it to a
+// user. Idempotent + race-safe: on a roles.name UNIQUE conflict we re-select the winner's row.
+const assignDefaultRole = async (db: ReturnType<typeof getDb>, userId: string) => {
+  let role = await db.select().from(roles).where(eq(roles.name, DEFAULT_ROLE_NAME)).get();
+  if (!role) {
+    const now = nowIso();
+    try {
+      await db.insert(roles).values({ id: uuid(), name: DEFAULT_ROLE_NAME, description: 'Standard user', permissions: JSON.stringify(DEFAULT_ROLE_PERMISSIONS), createdAt: now, updatedAt: now });
+    } catch (e: any) {
+      if (!String(e?.message || e).includes('UNIQUE constraint failed')) throw e; // lost a create race → re-select
+    }
+    role = await db.select().from(roles).where(eq(roles.name, DEFAULT_ROLE_NAME)).get();
+  }
+  if (role) await db.insert(userRoles).values({ userId, roleId: role.id }).onConflictDoNothing();
+};
+
 export const register = async (c: C) => {
-  const { email, password } = (await c.req.json().catch(() => ({}))) ?? {};
+  const { email, password, turnstileToken } = (await c.req.json().catch(() => ({}))) ?? {};
   if (!email || !password) return fail(c, 'AUTH_MISSING_FIELDS');
+  if (String(password).length < 6) return fail(c, 'AUTH_WEAK_PASSWORD');
+  const ip = c.req.header('CF-Connecting-IP') ?? undefined;
+  if (!(await verifyTurnstile(turnstileToken, c.env.TURNSTILE_SECRET_KEY, ip))) return fail(c, 'AUTH_TURNSTILE_FAILED');
   const db = getDb(c.env);
   const id = uuid(); const now = nowIso();
   try {
     await db.insert(users).values({ id, email: String(email).toLowerCase(), password: await hashPassword(password), fullName: '', accountType: 'free', status: 'active', createdAt: now, updatedAt: now });
   } catch (e: any) {
     if (String(e?.message || e).includes('UNIQUE constraint failed')) return fail(c, 'AUTH_EMAIL_EXISTS');
+    return fail(c, 'SERVER_ERROR');
+  }
+  try {
+    await assignDefaultRole(db, id);
+  } catch {
+    // Roll back the just-created user so a roleless orphan isn't left behind — that would
+    // block retry (AUTH_EMAIL_EXISTS) and be unusable. Keeps signup effectively atomic.
+    await db.delete(users).where(eq(users.id, id)).catch(() => {});
     return fail(c, 'SERVER_ERROR');
   }
   const token = await signToken(id, c.env.JWT_SECRET);
@@ -86,4 +126,54 @@ export const regenerateApiKey = async (c: C) => {
   const id = uuid(); const now = nowIso();
   await db.insert(apiKeys).values({ id, userId, keyName: 'Personal', keyHash, keyPrefix, scopes: JSON.stringify({ links: 'write', stats: 'read' }), status: 'active', isPersonal: 1, expiresAt: null, lastUsedAt: null, createdAt: now, updatedAt: now });
   return ok(c, { keyId: id, apiKey: fullKey, keyPrefix, apiKeyStatus: 'active', apiKeyExpiresAt: null });
+};
+
+export const googleSignin = async (c: C) => {
+  const { idToken } = (await c.req.json().catch(() => ({}))) ?? {};
+  if (!idToken) return fail(c, 'AUTH_GOOGLE_INVALID');
+  let claims;
+  try {
+    claims = await verifyGoogleIdToken(idToken, c.env.GOOGLE_CLIENT_ID);
+  } catch {
+    return fail(c, 'AUTH_GOOGLE_INVALID');
+  }
+  const db = getDb(c.env);
+  let created = false;
+
+  // 1) Existing Google account (matched by sub).
+  let u = await db.select().from(users).where(eq(users.googleSub, claims.sub)).get();
+
+  // 2) Otherwise link onto an existing password account with the same email.
+  if (!u) {
+    const byEmail = await db.select().from(users).where(eq(users.email, claims.email)).get();
+    if (byEmail) {
+      await db.update(users)
+        .set({ googleSub: claims.sub, fullName: byEmail.fullName || claims.name, updatedAt: nowIso() })
+        .where(eq(users.id, byEmail.id));
+      u = await db.select().from(users).where(eq(users.id, byEmail.id)).get();
+    }
+  }
+
+  // 3) Otherwise create a new Google-only account (empty-string password sentinel).
+  if (!u) {
+    const id = uuid(); const now = nowIso();
+    await db.insert(users).values({ id, email: claims.email, password: '', fullName: claims.name || '', accountType: 'free', status: 'active', googleSub: claims.sub, createdAt: now, updatedAt: now });
+    try {
+      await assignDefaultRole(db, id);
+    } catch {
+      // Roll back the new account so a roleless orphan isn't left behind (keeps retry clean).
+      await db.delete(users).where(eq(users.id, id)).catch(() => {});
+      return fail(c, 'SERVER_ERROR');
+    }
+    u = await db.select().from(users).where(eq(users.id, id)).get();
+    created = true;
+  }
+
+  if (!u) return fail(c, 'SERVER_ERROR');
+  if (u.status === 'inactive') return fail(c, 'AUTH_ACCOUNT_INACTIVE');
+  if (u.status === 'suspended') return fail(c, 'AUTH_ACCOUNT_SUSPENDED');
+  if (u.status === 'pending_verification') return fail(c, 'AUTH_ACCOUNT_PENDING');
+
+  const token = await signToken(u.id, c.env.JWT_SECRET);
+  return ok(c, { token, user: userPayload(u) }, created ? 201 : 200);
 };
