@@ -315,6 +315,7 @@
             </svg>
           </div>
           <span class="font-bold text-gray-700 dark:text-slate-300 text-sm">Blly.to</span>
+          <span class="text-[11px] font-mono font-semibold text-gray-400 dark:text-slate-500 bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-full px-2 py-0.5">v{{ appVersion }}</span>
         </div>
         <p class="text-xs text-gray-500 dark:text-slate-500">
           {{ $t('landing.copyright') }}
@@ -342,6 +343,9 @@ const { t } = useI18n();
 // send login/CTA to the app domain (VITE_APP_URL), falling back to a same-origin /login in dev.
 const loginUrl = (import.meta.env.VITE_APP_URL || '') + '/login';
 const signupUrl = (import.meta.env.VITE_APP_URL || '') + '/signup';
+
+// Project version, sourced from the root package.json at build time (see vite.config.js).
+const appVersion = import.meta.env.VITE_APP_VERSION;
 
 const stats = computed(() => [
   { value: t('landing.statFastValue'), label: t('landing.statFast') },

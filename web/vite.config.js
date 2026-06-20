@@ -1,5 +1,13 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
+import { readFileSync } from 'node:fs';
+
+// The project's single version lives in the ROOT package.json (one level up from web/).
+// Expose it through the standard VITE_ env channel so the client reads it via
+// `import.meta.env.VITE_APP_VERSION`, like every other build-time value in this app.
+process.env.VITE_APP_VERSION = JSON.parse(
+  readFileSync(new URL('../package.json', import.meta.url), 'utf-8')
+).version;
 
 export default defineConfig({
   plugins: [vue()],

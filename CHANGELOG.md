@@ -11,6 +11,9 @@ as the single project version — `api/` and `web/` `package.json` versions are 
 - **Landing navbar Sign in + Sign up buttons** (`web/src/views/LandingView.vue`): the navbar now shows a secondary
   "Sign in" link (→ `/login`) and a prominent gradient "Sign up" button on the right (→ `/signup`), replacing the
   single "Login" button.
+- **App version on the landing footer**: the root `package.json` version is read at build time in `web/vite.config.js`
+  and exposed via `import.meta.env.VITE_APP_VERSION`; the landing footer renders it as a `v{x.y.z}` pill next to the
+  brand.
 
 ### Changed
 - All "Get Started Free" CTAs route to **Sign up** (`/signup`). The bottom CTA button previously linked to `/login`;
