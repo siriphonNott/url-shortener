@@ -36,6 +36,8 @@ export const auth: MiddlewareHandler<AppBindings> = async (c, next) => {
   const token = c.req.header('Authorization')?.split(' ')[1];
   if (!token) return fail(c, 'AUTH_NO_TOKEN');
   try {
+    // Preserved quirk: on the JWT path req.user = { id, iat, exp } only — NO email/fullName (unlike the api-key
+    // branch above). Controllers must rely on req.user.id only. See docs/ARCHITECTURE.md §5.
     c.set('user', await verifyToken(token, c.env.JWT_SECRET));
     return next();
   } catch {

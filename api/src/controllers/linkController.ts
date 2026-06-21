@@ -12,6 +12,8 @@ import { parseDevice, COUNTRY_NAMES } from '../lib/geo';
 
 type C = Context<AppBindings>;
 const uuid = () => crypto.randomUUID();
+// Preserved quirk: link-by-:id routes disambiguate id (UUID) vs code by UUID SHAPE (was a 24-hex ObjectId regex in the
+// old API). Keep the shape check; do NOT switch to a lookup-by-both. See docs/ARCHITECTURE.md §5.
 const isUuid = (s: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
 const isUniqueErr = (e: unknown) => String((e as any)?.message || e).includes('UNIQUE constraint failed');
 

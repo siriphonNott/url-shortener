@@ -5,6 +5,18 @@ All notable changes to this project are documented here. Format based on
 [Semantic Versioning](https://semver.org/). The version tracks the **root `package.json`**
 as the single project version — `api/` and `web/` `package.json` versions are independent build versions.
 
+## [1.3.8] - 2026-06-22
+
+### Changed
+- **Added inline "do NOT fix" comments at the preserved-verbatim API-quirk sites** so a contributor editing the line
+  sees the warning without opening `docs/ARCHITECTURE.md` — closing the last gap where doc and code could drift apart.
+  Annotated: the `is_personal`-less `getApiKey` read (`authController.ts`), the JWT-path `req.user = {id,iat,exp}`
+  asymmetry (`middleware/auth.ts`), the UUID-shape id-vs-code disambiguation (`linkController.ts`), the no-`errorCode`
+  api-key ad-hoc error envelope and the Mobile/Desktop/Unknown key-stats device buckets that deliberately differ from
+  `parseDevice` (`apiKeyController.ts`), and the missing-name → `ROLE_NAME_EXISTS` mapping (`roleController.ts`). Each
+  references `ARCHITECTURE.md §5`. Comments only — no behavior change; 93/93 tests still pass. (The `waitUntil`-guard and
+  atomic click-count sites were already commented.)
+
 ## [1.3.7] - 2026-06-22
 
 ### Added

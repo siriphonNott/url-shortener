@@ -113,6 +113,8 @@ export const changePassword = async (c: C) => {
 
 export const getApiKey = async (c: C) => {
   const db = getDb(c.env);
+  // Preserved quirk: returns the NEWEST key for the user with NO is_personal filter (regenerateApiKey below filters
+  // isPersonal=1, but this read intentionally does not). Do NOT add `eq(apiKeys.isPersonal, 1)`. See docs/ARCHITECTURE.md §5.
   const k = await db.select().from(apiKeys).where(eq(apiKeys.userId, c.get('user').id)).orderBy(desc(apiKeys.createdAt)).get();
   if (!k) return ok(c, { hasKey: false });
   return ok(c, { hasKey: true, keyId: k.id, keyPrefix: k.keyPrefix, apiKeyStatus: k.status, apiKeyExpiresAt: k.expiresAt });

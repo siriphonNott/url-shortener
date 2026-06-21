@@ -10,6 +10,8 @@ import { last7Days, nowIso } from '../lib/time';
 
 type C = Context<AppBindings>;
 const uuid = () => crypto.randomUUID();
+// Preserved quirk: api-key ad-hoc errors are { success:false, message } with NO errorCode — the one intentional
+// exception to the flat ok()/fail() envelope. Keep byte-for-byte; do NOT route these through fail(). ARCHITECTURE.md §5.
 const adhoc = (c: C, message: string, status: 400 | 404) => c.json({ success: false, message }, status);
 const dayOf = (iso: string) => iso.split('T')[0];
 
@@ -88,6 +90,8 @@ export const getKeyStats = async (c: C) => {
     clicks: logs.filter((l) => dayOf(l.createdAt) === date).length,
     linksCreated: userLinks.filter((l) => dayOf(l.createdAt) === date).length,
   }));
+  // Preserved quirk: key-stats buckets UAs into Mobile/Desktop/Unknown — DELIBERATELY different from the link-analytics
+  // parseDevice ('Browser / OS'). Each mirrors its old endpoint; do NOT unify the two device parsers. ARCHITECTURE.md §5.
   const deviceMap: Record<string, number> = {};
   for (const l of logs) { const ua = (l.userAgent || '').toLowerCase(); let d = 'Unknown'; if (/mobile|android|iphone|ipad/.test(ua)) d = 'Mobile'; else if (/windows|mac|linux/.test(ua)) d = 'Desktop'; deviceMap[d] = (deviceMap[d] || 0) + 1; }
   const devices = Object.entries(deviceMap).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count);

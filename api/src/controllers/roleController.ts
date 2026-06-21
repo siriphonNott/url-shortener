@@ -21,7 +21,7 @@ export const getRoles = async (c: C) => {
 
 export const createRole = async (c: C) => {
   const { name, description, permissions } = (await c.req.json().catch(() => ({}))) ?? {};
-  if (!name) return fail(c, 'ROLE_NAME_EXISTS'); // preserved quirk
+  if (!name) return fail(c, 'ROLE_NAME_EXISTS'); // preserved quirk: missing name → ROLE_NAME_EXISTS (NOT a validation error); do NOT "fix" — ARCHITECTURE.md §5
   const db = getDb(c.env);
   const id = uuid(); const now = nowIso();
   try {
