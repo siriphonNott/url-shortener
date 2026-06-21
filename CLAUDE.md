@@ -15,7 +15,7 @@ Currently **live on the `eraflow.dev` zone** (blly.to is the eventual brand but 
   `CHANGELOG.md` and bump the **root `package.json`** version. Semver by change type: `patch` = fix/chore/docs,
   `minor` = new feature, `major` = breaking. The version anchors to root `package.json`; `api/`+`web/` versions stay
   independent. CHANGELOG follows Keep a Changelog (newest entry on top, `## [x.y.z] - YYYY-MM-DD`).
-- **Backend:** complete, **70/70 tests passing**.
+- **Backend:** complete, **93/93 tests passing** (21 test files), incl. email/password + Google + Turnstile signup.
 - **Deployed (Cloudflare account `siriphonnot@gmail.com`):**
   - `https://api.eraflow.dev` — API (Worker `blly-api`)
   - `https://eraflow.dev` — landing + short-link redirects (same Worker `blly-api`, static assets)
@@ -31,7 +31,8 @@ api/                 Cloudflare Worker (Hono + D1/Drizzle)
   src/controllers/   auth, link, user, role, apiKey, redirect
   src/routes/        auth, links, users, roles, apiKeys
   src/middleware/    auth (JWT + x-api-key), checkPermission (ported, NOT wired — RBAC is client-side)
-  src/lib/           errorCodes (ok/fail), password (PBKDF2), jwt (jose), keys (SHA-256 hash+prefix), meta, geo, time
+  src/lib/           errorCodes (ok/fail), password (PBKDF2), jwt (jose), keys (SHA-256 hash+prefix),
+                     google (Google ID-token verify), turnstile (siteverify), errorPage (broken-link HTML), meta, geo, time
   src/serializers/   wire shapes (_id vs id, camelCase, parsed JSON)
   src/db/            schema.ts (6 tables, Drizzle), client.ts ; drizzle/ = migrations
   src/seed.ts        idempotent admin seed (seedAdmin + ADMIN_PERMISSIONS)
@@ -49,7 +50,7 @@ docs/superpowers/    spec, plan, and the cutover runbook (see Reference)
 
 ```bash
 # API (run from api/)
-npm test                       # vitest run — 70 tests, local Miniflare D1 (no network)
+npm test                       # vitest run — 93 tests / 21 files, local Miniflare D1 (no network)
 npm run dev                    # wrangler dev → http://localhost:8787 (port pinned in wrangler.jsonc)
 npm run db:generate            # drizzle-kit generate (after editing src/db/schema.ts)
 npm run db:migrate:local       # apply migrations to local D1 (no auth)
@@ -66,8 +67,10 @@ npm run build                  # vite build → web/dist (uses .env.production)
 - **Single Worker, hostname dispatch** (`api/src/index.ts`): host starts with `api.` → `app.fetch` (Hono API);
   otherwise `env.ASSETS.fetch` first, and on **404** → `handleRedirect` (short-code 302). `/` (apex root) falls
   through to the asset 404 — never looked up as a code.
-- **D1 + Drizzle** — 6 tables (`users, roles, user_roles, links, api_keys, redirect_logs`), migrations in `drizzle/`.
-  Schema is the source of truth; CHECK constraints on enum columns are mirrored in both `schema.ts` and the migration SQL.
+- **D1 + Drizzle** — 6 tables (`users, roles, user_roles, links, api_keys, redirect_logs`), migrations in `drizzle/`
+  (`0000` baseline; `0001` adds `users.google_sub` + unique index for Google sign-in). Schema is the source of truth;
+  CHECK constraints on enum columns are mirrored in both `schema.ts` and the migration SQL. CI applies pending
+  migrations to remote D1 on deploy (keep them expand-only).
 - **Two deployed Workers:** `blly-api` (API + apex landing/redirect) and `blly-web` (SPA, `not_found_handling:
   single-page-application`). Both use `custom_domain: true` routes (wrangler auto-provisions DNS + edge TLS).
 - **Frontend split:** the apex (`eraflow.dev`) cannot use SPA fallback (it would shadow `/{code}`), so it serves the
@@ -83,6 +86,10 @@ npm run build                  # vite build → web/dist (uses .env.production)
 - **Auth:** JWT HS256 `{id,iat,exp}` 7-day (jose); passwords PBKDF2 (`lib/password.ts`); API keys stored as SHA-256
   `key_hash` + `key_prefix`. **Show-once:** the full key is returned ONLY on create/regenerate, never retrievable after
   (`getApiKey` returns `{ hasKey, keyPrefix }`; the UI masks it as `ak_live_xxxxxx********`).
+- **Sign-up paths:** email/password `POST /auth/register` is gated by Cloudflare Turnstile (`lib/turnstile.ts`
+  siteverify, needs `TURNSTILE_SECRET_KEY`) + a min-password-length check; Google sign-in is `POST /auth/google`
+  (verifies the Google ID token in `lib/google.ts`, needs `GOOGLE_CLIENT_ID`) and matches/links/creates a user via
+  `users.google_sub`. Both **fail closed** if their secret is unset. Self-service signups get the default `user` role.
 - **Link ownership:** every link-by-id path (get/update/delete/logs/analytics) filters by `createdBy` → cross-user = `LINK_NOT_FOUND`.
 - **RBAC is client-side by design** (spec §8). `checkPermission` exists but is wired into no route; users/roles/api-keys are
   intentional auth-only admin surfaces. Do NOT add server-side permission gating without checking the spec.
@@ -147,6 +154,9 @@ DNS). Pass via `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` env (never commi
 
 ## Reference
 
-- Spec: `docs/superpowers/specs/2026-06-19-cloudflare-d1-migration-design.md`
-- Plan (full per-task code): `docs/superpowers/plans/2026-06-19-cloudflare-d1-migration-backend.md`
+- Migration spec: `docs/superpowers/specs/2026-06-19-cloudflare-d1-migration-design.md`
+- Migration plan (full per-task code): `docs/superpowers/plans/2026-06-19-cloudflare-d1-migration-backend.md`
 - Cutover runbook (ops, deploy, seed, decommission): `docs/superpowers/2026-06-19-cloudflare-cutover-runbook.md`
+- Sign-up (Google + Turnstile) spec + plan: `docs/superpowers/specs/2026-06-20-signup-google-turnstile-design.md`,
+  `docs/superpowers/plans/2026-06-20-signup-google-turnstile.md`
+- Landing "Live Demo" animation spec: `docs/superpowers/specs/2026-06-21-landing-usage-demo-animation-design.md`

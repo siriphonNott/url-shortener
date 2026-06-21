@@ -13,6 +13,7 @@
 - Redirect แบบ 302 (ไม่ต้อง Auth) + นับ clickCount แบบ atomic และบันทึก redirect log (IP / User-Agent / Referer / ประเทศ-เมืองจาก `request.cf`)
 - Analytics: timeline 7 วัน, devices, trafficType, locations
 - Authentication ด้วย JWT (HS256, 7 วัน) และ API Key (`X-API-Key`) แบบ **hash + prefix + show-once**
+- สมัครสมาชิกด้วย Email/Password (กัน bot ด้วย **Cloudflare Turnstile**) หรือ **Google Sign-In** (ยืนยัน Google ID token)
 - จัดการ Users / Roles (RBAC) และ API Keys ผ่าน Web UI (Vue SPA) รองรับ 2 ภาษา (TH/EN) + Dark mode
 - Link ผูกกับเจ้าของ (`createdBy`) — แก้/ลบ/ดู logs ได้เฉพาะลิงก์ของตัวเอง
 
@@ -25,10 +26,10 @@
 | Runtime | Cloudflare Workers (ESM, ไม่มี Node built-ins, ไม่ใช้ `nodejs_compat` ใน prod) |
 | Web framework | Hono |
 | Database | Cloudflare D1 (SQLite) + Drizzle ORM / drizzle-kit |
-| Auth / Crypto | jose (JWT), WebCrypto (PBKDF2 password, SHA-256 API-key) |
+| Auth / Crypto | jose (JWT), WebCrypto (PBKDF2 password, SHA-256 API-key), Google ID-token + Cloudflare Turnstile |
 | Static / Routing | Workers Static Assets + custom domains, hostname-based routing |
 | Frontend | Vue 3, Vite, Pinia, Vue Router, vue-i18n, Tailwind CSS |
-| Testing | Vitest + `@cloudflare/vitest-pool-workers` (Miniflare D1) — 70 tests |
+| Testing | Vitest + `@cloudflare/vitest-pool-workers` (Miniflare D1) — 93 tests / 21 files |
 | Deploy | Cloudflare (Wrangler) |
 
 ---
@@ -53,7 +54,7 @@ url-shortener/
 │   │   ├── controllers/      # auth, link, user, role, apiKey, redirect
 │   │   ├── routes/           # auth, links, users, roles, apiKeys
 │   │   ├── middleware/        # auth (JWT + x-api-key), checkPermission
-│   │   ├── lib/              # errorCodes, password, jwt, keys, meta, geo, time
+│   │   ├── lib/              # errorCodes, password, jwt, keys, google, turnstile, errorPage, meta, geo, time
 │   │   ├── serializers/      # wire shapes (_id/id, camelCase)
 │   │   ├── db/               # schema.ts (6 tables), client.ts
 │   │   └── seed.ts           # idempotent admin seed
@@ -77,7 +78,7 @@ Response envelope แบบ **flat**: สำเร็จ `{ success:true, ...dat
 | Group | Method · Path | หมายเหตุ |
 |-------|---------------|----------|
 | Health | `GET /health` | `{ success:true, status:"ok" }` |
-| Auth | `POST /auth/register` · `POST /auth/login` | คืน JWT token |
+| Auth | `POST /auth/register` · `POST /auth/login` · `POST /auth/google` | register กัน bot ด้วย Turnstile · google = ยืนยัน ID-token (sign-in/link/create) · คืน JWT |
 | Auth | `GET /auth/me` · `PUT /auth/profile` · `PUT /auth/change-password` | ต้อง token |
 | Auth | `GET /auth/api-key` · `POST /auth/api-key/regenerate` | personal key (show-once) |
 | Links | `GET/POST /links` · `PUT/DELETE /links/:id` · `GET /links/code/:code` | owner-scoped |
@@ -126,8 +127,11 @@ rm -rf ../api/public/* && cp -r dist/. ../api/public/    # refresh apex landing
 cd ../api && npx wrangler deploy                          # → eraflow.dev (blly-api)
 ```
 
-ครั้งแรกต้อง `wrangler d1 create blly-db` แล้วใส่ `database_id` ใน `api/wrangler.jsonc`, ตั้ง secret `JWT_SECRET`,
-และ seed admin คนแรก — ดูขั้นตอนเต็มใน [docs/superpowers/2026-06-19-cloudflare-cutover-runbook.md](docs/superpowers/2026-06-19-cloudflare-cutover-runbook.md)
+ครั้งแรกต้อง `wrangler d1 create blly-db` แล้วใส่ `database_id` ใน `api/wrangler.jsonc`, ตั้ง secret `JWT_SECRET`
+(และ `TURNSTILE_SECRET_KEY` + `GOOGLE_CLIENT_ID` ให้ signup/Google sign-in ทำงานบน prod), และ seed admin คนแรก
+— ดูขั้นตอนเต็มใน [docs/superpowers/2026-06-19-cloudflare-cutover-runbook.md](docs/superpowers/2026-06-19-cloudflare-cutover-runbook.md)
+
+> หมายเหตุ: บน push ไป `main` มี **GitHub Actions** (`.github/workflows/deploy.yml`) รัน test → apply D1 migrations (remote) → build + deploy ทั้ง web และ api ให้อัตโนมัติ — manual deploy ด้านบนเป็น fallback
 
 ---
 

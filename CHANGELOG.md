@@ -5,6 +5,19 @@ All notable changes to this project are documented here. Format based on
 [Semantic Versioning](https://semver.org/). The version tracks the **root `package.json`**
 as the single project version — `api/` and `web/` `package.json` versions are independent build versions.
 
+## [1.3.6] - 2026-06-22
+
+### Changed
+- **Refreshed `CLAUDE.md` + `README.md` to match the current codebase (docs-only — no code/behavior change).**
+  Corrected the test count `70` → **93 (21 files)** everywhere it appeared; added the new `lib/` helpers
+  (`google` ID-token verify, `turnstile` siteverify, `errorPage` broken-link HTML) to both layout listings;
+  documented the sign-up surfaces — Turnstile-gated `POST /auth/register` (+ min-password check) and Google
+  sign-in `POST /auth/google` (verifies the Google ID token, matches/links/creates via `users.google_sub`),
+  both **fail-closed** when their secret is unset — plus the `users.google_sub` column / migration `0001` and
+  the CI "apply D1 migrations on deploy" step. Added `POST /auth/google` to the README endpoint table and the
+  `TURNSTILE_SECRET_KEY` / `GOOGLE_CLIENT_ID` runtime secrets to the deploy notes; listed the sign-up and
+  landing-demo specs/plans under CLAUDE.md → Reference.
+
 ## [1.3.5] - 2026-06-21
 
 ### Fixed
