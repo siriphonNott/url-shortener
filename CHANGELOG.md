@@ -5,6 +5,30 @@ All notable changes to this project are documented here. Format based on
 [Semantic Versioning](https://semver.org/). The version tracks the **root `package.json`**
 as the single project version — `api/` and `web/` `package.json` versions are independent build versions.
 
+## [1.3.7] - 2026-06-22
+
+### Added
+- **`docs/ARCHITECTURE.md`** — a single, current design-rationale + operations reference distilled from the now-removed
+  migration plans/specs/runbook: why-decisions (jose vs hono/jwt, pinned JWT `iat`, self-describing PBKDF2, the deliberate
+  api-key hash+prefix+show-once contract deviation, Google GIS ID-token flow + account-linking order), data-model &
+  migration foot-guns (additive-only migrations / the live-`users` rebuild that caused the prod 500, FK
+  `PRAGMA defer_foreign_keys`, UNIQUE→errorCode mapping, nanoid alphabet, the `getKeyStats` vs `parseDevice` split),
+  preserved-verbatim API quirks that must NOT be "fixed", the client-side RBAC seed matrix, test patterns (offline
+  `fetchMock`, Turnstile always-pass keys, `waitUntil` guard), ops (transient `_seed` admin bootstrap, clone-to-new-account,
+  legacy decommission), and scale limits / future roadmap.
+
+### Removed
+- **Cleared stale documentation** now that the migration, signup, and landing-demo features are all shipped: deleted the
+  six `docs/superpowers/` plan/spec/runbook files (~4,859 lines), the Express-era `promp.txt` seed prompt, and the
+  git-ignored `.superpowers/sdd/` SDD scratch (81 files). Every still-useful fact was first folded into
+  `docs/ARCHITECTURE.md` and confirmed by an adversarial completeness + accuracy pass (which also caught and fixed a
+  `GOOGLE_CLIENT_ID` secret-vs-var inaccuracy) before any deletion.
+
+### Changed
+- CLAUDE.md + README Reference/Deploy sections now point to `docs/ARCHITECTURE.md`; the two highest-risk foot-guns
+  (keep migrations additive; never set the apex Worker's `not_found_handling` to `single-page-application`) are inlined
+  in CLAUDE.md. Removed the `.superpowers/sdd/` line from the CLAUDE.md Layout.
+
 ## [1.3.6] - 2026-06-22
 
 ### Changed

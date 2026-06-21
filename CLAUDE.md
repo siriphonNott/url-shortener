@@ -42,8 +42,7 @@ web/                 Vue 3 SPA (Vite, vue-router history mode, pinia, vue-i18n, 
   src/views/LandingView.vue   public landing (/) ; login/CTA → VITE_APP_URL
   src/stores/auth.js          token + user + permissions + api-key state
   src/api/index.js            axios (baseURL = VITE_API_URL); 401 → clear token → /login
-docs/superpowers/    spec, plan, and the cutover runbook (see Reference)
-.superpowers/sdd/    SDD progress ledger + per-task briefs/reports (git-ignored scratch)
+docs/ARCHITECTURE.md design rationale, preserved-verbatim API quirks, ops (seed/clone/decommission), test patterns
 ```
 
 ## Commands
@@ -70,11 +69,14 @@ npm run build                  # vite build → web/dist (uses .env.production)
 - **D1 + Drizzle** — 6 tables (`users, roles, user_roles, links, api_keys, redirect_logs`), migrations in `drizzle/`
   (`0000` baseline; `0001` adds `users.google_sub` + unique index for Google sign-in). Schema is the source of truth;
   CHECK constraints on enum columns are mirrored in both `schema.ts` and the migration SQL. CI applies pending
-  migrations to remote D1 on deploy (keep them expand-only).
+  migrations to remote D1 on deploy — **keep every migration additive/expand-only; never rebuild a live table** (a
+  drizzle-kit `__new_users` rebuild on the live `users` table caused the prod Google sign-in 500; see `ARCHITECTURE.md` §3).
 - **Two deployed Workers:** `blly-api` (API + apex landing/redirect) and `blly-web` (SPA, `not_found_handling:
   single-page-application`). Both use `custom_domain: true` routes (wrangler auto-provisions DNS + edge TLS).
 - **Frontend split:** the apex (`eraflow.dev`) cannot use SPA fallback (it would shadow `/{code}`), so it serves the
   landing only and the landing's Login/CTA links point to `VITE_APP_URL` (`app.eraflow.dev`), where the full SPA runs.
+  ⚠️ **Never set `assets.not_found_handling: single-page-application` on the apex Worker** — SPA mode 200s every path and
+  shadows `/:code` redirects; the apex MUST 404 unmatched paths so `index.ts` treats them as codes (see `ARCHITECTURE.md` §1).
 
 ## Invariants — do NOT break these
 
@@ -118,7 +120,8 @@ prod those endpoints fail even though the frontend has the public `VITE_*` keys.
 
 **Manual deploy (fallback)** requires a CF API token with **Account: D1 Edit + Workers Scripts Edit + Account Settings
 Read; Zone(eraflow.dev): Workers Routes Edit + DNS Edit + Zone Read** (the "Edit Cloudflare Workers" template + D1 +
-DNS). Pass via `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` env (never commit it). Full procedure: see the cutover runbook.
+DNS). Pass via `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` env (never commit it). First-time admin seed, cloning to a
+new CF account, and legacy decommission are in `docs/ARCHITECTURE.md` §8 (Operations).
 
 - **Backend:** `cd api && npm run deploy` (D1 already created: `blly-db`, id in `wrangler.jsonc`; secret `JWT_SECRET` set remotely).
 - **Frontend — rebuild and deploy BOTH or the apex landing goes stale:**
@@ -154,9 +157,8 @@ DNS). Pass via `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` env (never commi
 
 ## Reference
 
-- Migration spec: `docs/superpowers/specs/2026-06-19-cloudflare-d1-migration-design.md`
-- Migration plan (full per-task code): `docs/superpowers/plans/2026-06-19-cloudflare-d1-migration-backend.md`
-- Cutover runbook (ops, deploy, seed, decommission): `docs/superpowers/2026-06-19-cloudflare-cutover-runbook.md`
-- Sign-up (Google + Turnstile) spec + plan: `docs/superpowers/specs/2026-06-20-signup-google-turnstile-design.md`,
-  `docs/superpowers/plans/2026-06-20-signup-google-turnstile.md`
-- Landing "Live Demo" animation spec: `docs/superpowers/specs/2026-06-21-landing-usage-demo-animation-design.md`
+- **`docs/ARCHITECTURE.md`** — the single design-rationale + operations reference: why-decisions (jose vs hono/jwt,
+  PBKDF2, API-key contract, Google GIS flow), preserved-verbatim API quirks (do NOT "fix"), migration foot-guns
+  (additive-only, FK PRAGMA, UNIQUE→errorCode), admin-seed bootstrap, clone-to-new-account, legacy decommission, test
+  patterns (offline fetchMock, Turnstile test keys), and scale limits / future roadmap.
+  (Consolidated from the former per-task migration plan, design specs, and cutover runbook — all shipped and removed.)

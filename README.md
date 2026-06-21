@@ -129,7 +129,7 @@ cd ../api && npx wrangler deploy                          # → eraflow.dev (bll
 
 ครั้งแรกต้อง `wrangler d1 create blly-db` แล้วใส่ `database_id` ใน `api/wrangler.jsonc`, ตั้ง secret `JWT_SECRET`
 (และ `TURNSTILE_SECRET_KEY` + `GOOGLE_CLIENT_ID` ให้ signup/Google sign-in ทำงานบน prod), และ seed admin คนแรก
-— ดูขั้นตอนเต็มใน [docs/superpowers/2026-06-19-cloudflare-cutover-runbook.md](docs/superpowers/2026-06-19-cloudflare-cutover-runbook.md)
+— ดูขั้นตอนเต็ม (admin seed / clone account / decommission) ใน [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) §8
 
 > หมายเหตุ: บน push ไป `main` มี **GitHub Actions** (`.github/workflows/deploy.yml`) รัน test → apply D1 migrations (remote) → build + deploy ทั้ง web และ api ให้อัตโนมัติ — manual deploy ด้านบนเป็น fallback
 
@@ -137,7 +137,5 @@ cd ../api && npx wrangler deploy                          # → eraflow.dev (bll
 
 ## เอกสารเพิ่มเติม
 
-- **Spec / ดีไซน์:** [docs/superpowers/specs/](docs/superpowers/specs/)
-- **Implementation plan:** [docs/superpowers/plans/](docs/superpowers/plans/)
-- **Cutover runbook (ops/deploy):** [docs/superpowers/2026-06-19-cloudflare-cutover-runbook.md](docs/superpowers/2026-06-19-cloudflare-cutover-runbook.md)
-- **คู่มือสำหรับ AI agent (สถาปัตยกรรม/คอนเวนชัน/gotchas):** [CLAUDE.md](CLAUDE.md)
+- **สถาปัตยกรรม / เหตุผลออกแบบ / ops:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — why-decisions, API quirks ที่ห้ามแก้, migration foot-guns, admin seed / clone / decommission, test patterns, scale & roadmap
+- **คู่มือสำหรับ AI agent (state/คอนเวนชัน/invariants/gotchas):** [CLAUDE.md](CLAUDE.md)
