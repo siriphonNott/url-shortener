@@ -13,14 +13,14 @@
   "d1_databases": [
     { "binding": "DB", "database_name": "blly-db", "database_id": "2bad526c-f4af-45f3-ae61-dfacada1cf90", "migrations_dir": "drizzle" }
   ],
-  // Deployed on the eraflow.dev zone (blly.to is not yet in this Cloudflare account).
+  // Deployed on the blly.to zone.
   // custom_domain:true makes wrangler auto-provision the proxied DNS record + edge TLS cert.
-  // api.eraflow.dev → Hono API; eraflow.dev (apex) → assets/redirect (see src/index.ts).
+  // api.blly.to → Hono API; blly.to (apex) → assets/redirect (see src/index.ts).
   "routes": [
-    { "pattern": "api.eraflow.dev", "custom_domain": true },
-    { "pattern": "eraflow.dev", "custom_domain": true }
+    { "pattern": "api.blly.to", "custom_domain": true },
+    { "pattern": "blly.to", "custom_domain": true }
   ],
-  "vars": { "BASE_SHORT_URL": "https://eraflow.dev" },
+  "vars": { "BASE_SHORT_URL": "https://blly.to" },
   // Local `wrangler dev` only — pin to a fixed port so the web dev proxy (web/vite.config.js) is deterministic.
   "dev": { "port": 8787 }
 }

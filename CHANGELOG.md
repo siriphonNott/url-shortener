@@ -5,6 +5,27 @@ All notable changes to this project are documented here. Format based on
 [Semantic Versioning](https://semver.org/). The version tracks the **root `package.json`**
 as the single project version — `api/` and `web/` `package.json` versions are independent build versions.
 
+## [1.4.0] - 2026-06-23
+
+### Changed
+- **Domain cutover `eraflow.dev` → `blly.to`** (full swap — the brand domain is now active in the Cloudflare account,
+  so the prior "not yet in the CF account" caveat no longer applies). Updated every functional, domain-bound site:
+  `api/wrangler.jsonc` routes (`api.blly.to` + apex `blly.to`) and `BASE_SHORT_URL` (`https://blly.to`); the API CORS
+  origin (`api/src/app.ts` → `https://app.blly.to`); `web/.env.production` (`VITE_API_URL` / `VITE_BASE_SHORT_URL` /
+  `VITE_APP_URL`); the `blly-web` route (`web/wrangler.jsonc` → `app.blly.to`); and the local-dev proxy `Host` header
+  (`web/vite.config.js` → `api.blly.to`). The old `eraflow.dev` / `api.eraflow.dev` / `app.eraflow.dev` routes are
+  removed, so those hosts now 404 (no backward-compat alias). Worker names (`blly-api` / `blly-web`), D1 (`blly-db`),
+  and all runtime secrets (`JWT_SECRET`, `TURNSTILE_SECRET_KEY`, `GOOGLE_CLIENT_ID`) are unchanged.
+- **Turnstile widget `blly-signup`** allowed-domains list extended to include `app.blly.to` (+ `blly.to`); the public
+  site key (`VITE_TURNSTILE_SITE_KEY`) and the `TURNSTILE_SECRET_KEY` secret are unchanged.
+- **Docs** (CLAUDE.md, README.md, `docs/ARCHITECTURE.md`, GitHub Actions step names) updated to `blly.to`; the stale
+  "blly.to not yet in the CF account" notes are removed, and the generic "moving to another domain" runbook now
+  enumerates every domain-bound site (config, CORS, vite Host header, Turnstile domains, Google OAuth origins).
+
+> ⚠️ **One-time manual step (not in code):** add `https://app.blly.to` to the OAuth **Web** client's Authorized
+> JavaScript origins in Google Cloud Console (the `VITE_GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_ID` is unchanged). Until that
+> is done, email/password + Turnstile signup work on `app.blly.to`, but **Google sign-in will fail** there.
+
 ## [1.3.8] - 2026-06-22
 
 ### Changed

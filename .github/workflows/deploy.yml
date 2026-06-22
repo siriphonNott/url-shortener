@@ -62,7 +62,7 @@ jobs:
         run: npm run build
         working-directory: web
 
-      - name: Deploy web SPA (app.eraflow.dev)
+      - name: Deploy web SPA (app.blly.to)
         run: npx wrangler deploy
         working-directory: web
         env:
@@ -74,7 +74,7 @@ jobs:
           rm -rf api/public/*
           cp -r web/dist/. api/public/
 
-      - name: Deploy API worker (api.eraflow.dev + eraflow.dev)
+      - name: Deploy API worker (api.blly.to + blly.to)
         run: npx wrangler deploy
         working-directory: api
         env:

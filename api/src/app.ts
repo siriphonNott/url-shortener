@@ -14,7 +14,7 @@ export const app = new Hono<AppBindings>();
 
 app.onError((_err, c) => fail(c, 'SERVER_ERROR'));
 
-app.use('/api/v1/*', cors({ origin: ['https://app.eraflow.dev', 'http://localhost:5173'] }));
+app.use('/api/v1/*', cors({ origin: ['https://app.blly.to', 'http://localhost:5173'] }));
 
 app.get('/api/v1/health', (c) => c.json({ success: true, status: 'ok' }));
 app.route('/api/v1/auth', authRoutes);

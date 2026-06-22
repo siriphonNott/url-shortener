@@ -20,9 +20,9 @@ Single Worker, hostname dispatch (`api/src/index.ts`): host starting with `api.`
 
 - **⚠️ The apex Worker (`blly-api`) must NOT set `assets.not_found_handling: "single-page-application"`.** SPA mode
   returns HTTP 200 for *every* path, which would shadow `/:code` redirects entirely. The apex **must 404** unmatched
-  paths so `index.ts` can interpret them as short codes. (The SPA fallback belongs only on `blly-web` / `app.eraflow.dev`.)
+  paths so `index.ts` can interpret them as short codes. (The SPA fallback belongs only on `blly-web` / `app.blly.to`.)
 - Local smoke-test recipe to prove asset-vs-code precedence before deploy: with `wrangler dev` running, `register` →
-  create a link → `GET /:code` expecting a 302. Hit the API via the `Host: api.eraflow.dev` header (bare `localhost`
+  create a link → `GET /:code` expecting a 302. Hit the API via the `Host: api.blly.to` header (bare `localhost`
   never matches `api.*`).
 
 ---
@@ -192,7 +192,7 @@ Ported byte-for-byte from the old Express API to preserve the client contract. A
   the frontend ships it as `VITE_GOOGLE_CLIENT_ID` — so it is not a true secret; this deployment just supplies it via
   `wrangler secret put` for convenience. It could equally live in `wrangler.jsonc` `vars`.
 - **Google Cloud setup (one-time, user action):** create an OAuth **Web** client with Authorized JavaScript origins
-  `https://app.eraflow.dev` + `http://localhost:5173`. A real Google OAuth Client ID is required to exercise Google
+  `https://app.blly.to` + `http://localhost:5173`. A real Google OAuth Client ID is required to exercise Google
   sign-in — there is no universal test client.
 
 ### First-time admin seed (fresh / cloned account)
@@ -209,7 +209,7 @@ There is **no committed seed endpoint** by design. To bootstrap the first admin 
 2. Set `JWT_SECRET`, `TURNSTILE_SECRET_KEY`, and `GOOGLE_CLIENT_ID` via `wrangler secret put` (CI sets none of them).
 3. Run the first-time admin-seed bootstrap above.
 4. Update domain-bound config (CORS origin in `src/app.ts`, both `wrangler.jsonc` routes, `web/.env.production`) if the
-   zone differs from `eraflow.dev`.
+   zone differs from `blly.to`.
 
 ### Decommissioning the legacy stack (Express/Mongo)
 Do this **only after traffic is confirmed on D1**: point the frontend at the new API base, retire the Vercel/Express API

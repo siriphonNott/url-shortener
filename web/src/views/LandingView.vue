@@ -369,7 +369,7 @@ import { useTheme } from '../composables/useTheme';
 const { init: initTheme } = useTheme();
 const { t } = useI18n();
 
-// Landing is served on the apex (eraflow.dev) while the app lives on a separate host;
+// Landing is served on the apex (blly.to) while the app lives on a separate host;
 // send login/CTA to the app domain (VITE_APP_URL), falling back to a same-origin /login in dev.
 const loginUrl = (import.meta.env.VITE_APP_URL || '') + '/login';
 const signupUrl = (import.meta.env.VITE_APP_URL || '') + '/signup';

@@ -2,7 +2,7 @@
 
 URL shortener, **migrated from Express/MongoDB (Vercel) → Cloudflare Workers + D1**. Monorepo:
 `api/` (Hono Worker on D1 via Drizzle) and `web/` (Vue 3 SPA: landing + management app).
-Currently **live on the `eraflow.dev` zone** (blly.to is the eventual brand but not yet in the CF account).
+Currently **live on the `blly.to` zone** (the production brand domain; previously ran on `eraflow.dev`).
 
 ## Current state (resume here)
 
@@ -17,9 +17,9 @@ Currently **live on the `eraflow.dev` zone** (blly.to is the eventual brand but 
   independent. CHANGELOG follows Keep a Changelog (newest entry on top, `## [x.y.z] - YYYY-MM-DD`).
 - **Backend:** complete, **93/93 tests passing** (21 test files), incl. email/password + Google + Turnstile signup.
 - **Deployed (Cloudflare account `siriphonnot@gmail.com`):**
-  - `https://api.eraflow.dev` — API (Worker `blly-api`)
-  - `https://eraflow.dev` — landing + short-link redirects (same Worker `blly-api`, static assets)
-  - `https://app.eraflow.dev` — management SPA (Worker `blly-web`, static assets + SPA fallback)
+  - `https://api.blly.to` — API (Worker `blly-api`)
+  - `https://blly.to` — landing + short-link redirects (same Worker `blly-api`, static assets)
+  - `https://app.blly.to` — management SPA (Worker `blly-web`, static assets + SPA fallback)
 - **Workflow the user wants:** test locally → confirm → **then** deploy. Do NOT deploy without confirmation.
 
 ## Layout
@@ -73,8 +73,8 @@ npm run build                  # vite build → web/dist (uses .env.production)
   drizzle-kit `__new_users` rebuild on the live `users` table caused the prod Google sign-in 500; see `ARCHITECTURE.md` §3).
 - **Two deployed Workers:** `blly-api` (API + apex landing/redirect) and `blly-web` (SPA, `not_found_handling:
   single-page-application`). Both use `custom_domain: true` routes (wrangler auto-provisions DNS + edge TLS).
-- **Frontend split:** the apex (`eraflow.dev`) cannot use SPA fallback (it would shadow `/{code}`), so it serves the
-  landing only and the landing's Login/CTA links point to `VITE_APP_URL` (`app.eraflow.dev`), where the full SPA runs.
+- **Frontend split:** the apex (`blly.to`) cannot use SPA fallback (it would shadow `/{code}`), so it serves the
+  landing only and the landing's Login/CTA links point to `VITE_APP_URL` (`app.blly.to`), where the full SPA runs.
   ⚠️ **Never set `assets.not_found_handling: single-page-application` on the apex Worker** — SPA mode 200s every path and
   shadows `/:code` redirects; the apex MUST 404 unmatched paths so `index.ts` treats them as codes (see `ARCHITECTURE.md` §1).
 
@@ -102,36 +102,38 @@ The Worker routes by **hostname**, and bare `localhost` never matches `api.*`, s
 
 - `api/.dev.vars` (gitignored): `JWT_SECRET` + `BASE_SHORT_URL=http://localhost:8787` for `wrangler dev`.
 - `web/.env` (gitignored): `VITE_API_URL=/api/v1` (relative → proxied), `VITE_BASE_SHORT_URL=http://localhost:8787`.
-- `web/vite.config.js`: proxies `/api/v1` → `localhost:8787` with `Host: api.eraflow.dev` so the Worker routes to the API.
+- `web/vite.config.js`: proxies `/api/v1` → `localhost:8787` with `Host: api.blly.to` so the Worker routes to the API.
 - `api/wrangler.jsonc` pins `dev.port: 8787` so the proxy target is deterministic.
 
 Run: `cd api && npm run dev` (terminal 1) and `cd web && npm run dev` (terminal 2), then open `http://localhost:5173`.
 Local D1 is fully local (Miniflare) — migrate with `npm run db:migrate:local`. A local admin is seeded:
 **`local@test.dev` / `localpw123`** (local-only throwaway), or register a new account.
 
-## Deployment (eraflow.dev)
+## Deployment (blly.to)
 
 **CI/CD (primary):** `.github/workflows/deploy.yml` runs on **push to `main`** — runs the api test suite, then (on
-green) builds web → deploys the SPA (`app.eraflow.dev`) → refreshes the apex landing in `api/public` → deploys the api
-Worker (`api.eraflow.dev` + `eraflow.dev`). Needs GitHub repo secrets `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID`.
+green) builds web → deploys the SPA (`app.blly.to`) → refreshes the apex landing in `api/public` → deploys the api
+Worker (`api.blly.to` + `blly.to`). Needs GitHub repo secrets `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID`.
 The Worker also needs **runtime secrets set once** via `wrangler secret put` (CI does NOT set these): `JWT_SECRET` (set),
 plus `TURNSTILE_SECRET_KEY` and `GOOGLE_CLIENT_ID` — the latter two back signup/Google sign-in server-side; if missing in
 prod those endpoints fail even though the frontend has the public `VITE_*` keys.
 
 **Manual deploy (fallback)** requires a CF API token with **Account: D1 Edit + Workers Scripts Edit + Account Settings
-Read; Zone(eraflow.dev): Workers Routes Edit + DNS Edit + Zone Read** (the "Edit Cloudflare Workers" template + D1 +
+Read; Zone(blly.to): Workers Routes Edit + DNS Edit + Zone Read** (the "Edit Cloudflare Workers" template + D1 +
 DNS). Pass via `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` env (never commit it). First-time admin seed, cloning to a
 new CF account, and legacy decommission are in `docs/ARCHITECTURE.md` §8 (Operations).
 
 - **Backend:** `cd api && npm run deploy` (D1 already created: `blly-db`, id in `wrangler.jsonc`; secret `JWT_SECRET` set remotely).
 - **Frontend — rebuild and deploy BOTH or the apex landing goes stale:**
   ```bash
-  cd web && npm run build && npx wrangler deploy          # → app.eraflow.dev
+  cd web && npm run build && npx wrangler deploy          # → app.blly.to
   rm -rf ../api/public/* && cp -r dist/. ../api/public/    # refresh apex landing
-  cd ../api && npx wrangler deploy                          # → eraflow.dev + api.eraflow.dev
+  cd ../api && npx wrangler deploy                          # → blly.to + api.blly.to
   ```
-- **Moving to blly.to later:** add blly.to to the CF account, then update `web/.env.production`, both `wrangler.jsonc`
-  routes, and the API CORS origin (`src/app.ts`), and rebuild+redeploy both.
+- **Moving to another domain later:** add the new zone to the CF account, then update `web/.env.production`, both
+  `wrangler.jsonc` routes, the API CORS origin (`src/app.ts`), the local-dev `Host` header (`web/vite.config.js`), the
+  Turnstile widget's allowed domains, and the Google OAuth client's authorized JavaScript origins; then rebuild+redeploy
+  both. (This is exactly how the `eraflow.dev → blly.to` cutover was done — see CHANGELOG `1.4.0`.)
 
 ## Testing
 
@@ -150,7 +152,7 @@ new CF account, and legacy decommission are in `docs/ARCHITECTURE.md` §8 (Opera
   `IdentitiesOnly yes` for github.com). **No PRs** — see Working flow in Current state.
 - **`gh` CLI:** the active account defaults to `developerf03`; switch with `gh auth switch --hostname github.com --user
   siriphonNott` if you need `gh` (e.g. setting repo secrets), then switch back.
-- **Local DNS cache:** a sandbox may fail to resolve `*.eraflow.dev` (stale NXDOMAIN) right after deploy; test with
+- **Local DNS cache:** a sandbox may fail to resolve `*.blly.to` (stale NXDOMAIN) right after deploy; test with
   `curl --resolve host:443:104.21.67.192 ...`. Public DNS (and real browsers) resolve fine.
 - `database_id` in `wrangler.jsonc` is the real `blly-db` id; if cloning to a new account, recreate D1 and replace it.
 - `api/.wrangler/` (local D1 state) is gitignored — never commit it.

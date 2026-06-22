@@ -2,8 +2,8 @@
 
 ระบบจัดการ Short Link พร้อม Analytics, RBAC และ API Keys รันบน **Cloudflare Workers + D1** (เดิมเป็น Express + MongoDB บน Vercel, ย้ายมาทั้งหมดแล้ว)
 
-> **Live (เดโม):** API `https://api.eraflow.dev` · Short links + Landing `https://eraflow.dev` · แอปจัดการ `https://app.eraflow.dev`
-> โดเมนเป้าหมายคือ `blly.to` (ยังไม่ได้เพิ่มเข้า Cloudflare account จึงรันบน `eraflow.dev` ไปก่อน)
+> **Live (เดโม):** API `https://api.blly.to` · Short links + Landing `https://blly.to` · แอปจัดการ `https://app.blly.to`
+> โดเมนหลักคือ `blly.to` (production brand — ย้ายมาจาก `eraflow.dev` เดิมใน v1.4.0)
 
 ---
 
@@ -38,7 +38,7 @@
 
 - **Worker เดียว routing ด้วย hostname** (`api/src/index.ts`): host ขึ้นต้น `api.` → ส่งเข้า Hono API; ไม่งั้นลอง static assets ก่อน แล้ว 404 → ตีความเป็น short code แล้ว redirect (apex `/` ตกไปที่ landing)
 - **2 Workers ตอน deploy:** `blly-api` (API + landing + redirect) และ `blly-web` (SPA — เปิด SPA fallback). ทั้งคู่ผูก custom domain (Wrangler สร้าง DNS + TLS ให้อัตโนมัติ)
-- **Frontend แยกโดเมน:** apex ใช้ SPA fallback ไม่ได้ (จะทับ `/{code}`) จึงเสิร์ฟ Landing อย่างเดียว และปุ่ม Login ของ Landing ชี้ไปที่ `app.eraflow.dev` ที่รัน SPA เต็ม
+- **Frontend แยกโดเมน:** apex ใช้ SPA fallback ไม่ได้ (จะทับ `/{code}`) จึงเสิร์ฟ Landing อย่างเดียว และปุ่ม Login ของ Landing ชี้ไปที่ `app.blly.to` ที่รัน SPA เต็ม
 - **RBAC บังคับฝั่ง client** (middleware `checkPermission` มีแต่ยังไม่ wire) — endpoint ฝั่ง users/roles/api-keys เป็น admin surface แบบ auth-only
 
 ---
@@ -65,7 +65,7 @@ url-shortener/
 └── web/                      # Vue 3 SPA (landing + management app)
     ├── src/{views,components,stores,api,router,i18n,...}
     ├── vite.config.js        # dev proxy → worker (Host rewrite)
-    └── wrangler.jsonc        # static-assets Worker (SPA fallback) → app.eraflow.dev
+    └── wrangler.jsonc        # static-assets Worker (SPA fallback) → app.blly.to
 ```
 
 ---
@@ -87,7 +87,7 @@ Response envelope แบบ **flat**: สำเร็จ `{ success:true, ...dat
 | Users | `GET/POST /users` · `PUT/DELETE /users/:id` | admin (auth-only) |
 | Roles | `GET/POST /roles` · `PUT/DELETE /roles/:id` | admin (auth-only) |
 | API Keys | `GET/POST /api-keys` · `PUT/DELETE /api-keys/:id` · `GET /api-keys/:id/stats` | admin (auth-only) |
-| Redirect | `GET https://eraflow.dev/:code` | public 302 (ผ่านโดเมนหลัก ไม่ใช่ `/api`) |
+| Redirect | `GET https://blly.to/:code` | public 302 (ผ่านโดเมนหลัก ไม่ใช่ `/api`) |
 
 Auth headers: `Authorization: Bearer <token>` หรือ `X-API-Key: <key>`
 
@@ -107,24 +107,24 @@ cd web && npm run dev
 
 - `api/.dev.vars` (gitignored): `JWT_SECRET`, `BASE_SHORT_URL=http://localhost:8787`
 - `web/.env` (gitignored): `VITE_API_URL=/api/v1` (relative — ผ่าน proxy), `VITE_BASE_SHORT_URL=http://localhost:8787`
-- เนื่องจาก Worker route ด้วย hostname, Vite proxy จะ forward `/api/v1` ไป `:8787` พร้อม header `Host: api.eraflow.dev`
+- เนื่องจาก Worker route ด้วย hostname, Vite proxy จะ forward `/api/v1` ไป `:8787` พร้อม header `Host: api.blly.to`
 - เทสต์ backend: `cd api && npm test`
 
 ---
 
 ## Deploy (Cloudflare)
 
-ต้องมี API token สิทธิ์: **Account** — D1 Edit, Workers Scripts Edit, Account Settings Read · **Zone (eraflow.dev)** — Workers Routes Edit, DNS Edit, Zone Read
+ต้องมี API token สิทธิ์: **Account** — D1 Edit, Workers Scripts Edit, Account Settings Read · **Zone (blly.to)** — Workers Routes Edit, DNS Edit, Zone Read
 (ส่งผ่าน env `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` — อย่า commit token)
 
 ```bash
 # Backend
-cd api && npm run db:migrate:remote && npm run deploy   # → api.eraflow.dev + eraflow.dev (blly-api)
+cd api && npm run db:migrate:remote && npm run deploy   # → api.blly.to + blly.to (blly-api)
 
 # Frontend — ต้อง build + deploy ทั้งสองที่ ไม่งั้น landing บน apex จะค้างของเก่า
-cd web && npm run build && npx wrangler deploy           # → app.eraflow.dev (blly-web)
+cd web && npm run build && npx wrangler deploy           # → app.blly.to (blly-web)
 rm -rf ../api/public/* && cp -r dist/. ../api/public/    # refresh apex landing
-cd ../api && npx wrangler deploy                          # → eraflow.dev (blly-api)
+cd ../api && npx wrangler deploy                          # → blly.to (blly-api)
 ```
 
 ครั้งแรกต้อง `wrangler d1 create blly-db` แล้วใส่ `database_id` ใน `api/wrangler.jsonc`, ตั้ง secret `JWT_SECRET`

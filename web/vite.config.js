@@ -22,7 +22,7 @@ export default defineConfig({
         changeOrigin: true,
         configure: (proxy) => {
           proxy.on('proxyReq', (proxyReq) => {
-            proxyReq.setHeader('Host', 'api.eraflow.dev');
+            proxyReq.setHeader('Host', 'api.blly.to');
           });
         },
       },
